@@ -8,7 +8,7 @@ Add `serial` as a dependency in `Cargo.toml`:
 
 ```toml
 [dependencies]
-serial = "0.0.1"
+serial = "0.0.2"
 ```
 
 Import the `serial` crate and everything from the `serial::prelude` module. The `serial::prelude`
