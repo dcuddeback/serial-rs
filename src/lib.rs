@@ -1,7 +1,8 @@
-#![feature(std_misc,old_io,old_path,libc)]
+#![feature(std_misc,libc,io)]
+
+use std::io;
 
 use std::default::Default;
-use std::old_io::IoResult;
 use std::time::duration::Duration;
 
 pub use BaudRate::*;
@@ -69,18 +70,18 @@ pub enum FlowControl {
   FlowHardware
 }
 
-pub trait SerialPort: Reader+Writer {
+pub trait SerialPort: io::Read+io::Write {
   type Settings: SerialPortSettings;
 
   fn settings(&self) -> Self::Settings;
-  fn apply_settings(&mut self, settings: &Self::Settings) -> IoResult<()>;
+  fn apply_settings(&mut self, settings: &Self::Settings) -> io::Result<()>;
 
   fn timeout(&self) -> Duration;
   fn set_timeout(&mut self, timeout: Duration);
 }
 
 pub trait SerialPortExt: SerialPort {
-  fn configure<F: FnOnce(&mut <Self as SerialPort>::Settings) -> ()>(&mut self, setup: F) -> IoResult<()> {
+  fn configure<F: FnOnce(&mut <Self as SerialPort>::Settings) -> ()>(&mut self, setup: F) -> io::Result<()> {
     let mut settings = self.settings();
     setup(&mut settings);
     self.apply_settings(&settings)

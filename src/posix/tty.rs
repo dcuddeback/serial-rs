@@ -1,12 +1,13 @@
 extern crate libc;
 extern crate termios;
 
-use std::old_io as io;
+use std::io;
 
 use std::default::Default;
-use std::ffi::CString;
-use std::old_io::{IoResult,IoError};
+use std::path::Path;
 use std::time::duration::Duration;
+
+use std::os::unix::prelude::OsStrExt;
 
 use self::libc::{c_int,c_void,size_t};
 
@@ -30,17 +31,14 @@ pub struct TTYPort {
 }
 
 impl TTYPort {
-  pub fn open(path: &Path) -> IoResult<Self> {
+  pub fn open(path: &Path) -> io::Result<Self> {
     use self::libc::{O_RDWR,O_NONBLOCK};
 
-    let cstr = match CString::new(path.as_vec()) {
-      Ok(s) => s,
-      Err(_) => return Err(io::standard_error(io::InvalidInput))
-    };
+    let cstr = try!(path.as_os_str().to_cstring());
 
     let fd = unsafe { libc::open(cstr.as_ptr(), O_RDWR | O_NOCTTY | O_NONBLOCK, 0) };
     if fd < 0 {
-      return Err(IoError::last_error());
+      return Err(io::Error::last_os_error());
     }
 
     let mut port = TTYPort {
@@ -67,8 +65,8 @@ impl Drop for TTYPort {
   }
 }
 
-impl Reader for TTYPort {
-  fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
+impl io::Read for TTYPort {
+  fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
     try!(super::poll::wait_read_fd(self.fd, self.timeout));
 
     let len = unsafe { libc::read(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t) };
@@ -76,37 +74,27 @@ impl Reader for TTYPort {
     if len >= 0 {
       Ok(len as usize)
     }
-    else if len == 0 {
-      Err(io::standard_error(io::EndOfFile))
-    }
     else {
-      Err(IoError::last_error())
+      Err(io::Error::last_os_error())
     }
   }
 }
 
-impl Writer for TTYPort {
-  fn write_all(&mut self, buf: &[u8]) -> IoResult<()> {
+impl io::Write for TTYPort {
+  fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
     try!(super::poll::wait_write_fd(self.fd, self.timeout));
 
     let len = unsafe { libc::write(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t) };
 
     if len >= 0 {
-      let len = len as usize;
-
-      if len == buf.len() {
-        Ok(())
-      }
-      else {
-        Err(io::standard_error(io::ShortWrite(len)))
-      }
+      Ok(len as usize)
     }
     else {
-      Err(IoError::last_error())
+      Err(io::Error::last_os_error())
     }
   }
 
-  fn flush(&mut self) -> IoResult<()> {
+  fn flush(&mut self) -> io::Result<()> {
     termios::tcdrain(self.fd)
   }
 }
@@ -118,7 +106,7 @@ impl SerialPort for TTYPort {
     self.settings
   }
 
-  fn apply_settings(&mut self, settings: &TTYSettings) -> IoResult<()> {
+  fn apply_settings(&mut self, settings: &TTYSettings) -> io::Result<()> {
     use self::termios::Termios;
     use self::termios::{cfsetspeed,tcsetattr,tcflush};
     use self::termios::{TCSANOW,TCIOFLUSH};
@@ -165,7 +153,7 @@ impl SerialPort for TTYPort {
       ::Baud57600    => termios::ffi::B57600,
       ::Baud115200   => termios::ffi::B115200,
       ::Baud230400   => termios::ffi::B230400,
-      ::BaudOther(_) => return Err(io::standard_error(io::InvalidInput))
+      ::BaudOther(_) => return Err(io::Error::new(io::ErrorKind::InvalidInput, "baud rate is not supported", None))
     };
     try!(cfsetspeed(&mut termios, baud));
 

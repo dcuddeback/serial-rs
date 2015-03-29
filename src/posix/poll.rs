@@ -2,9 +2,8 @@
 
 extern crate libc;
 
-use std::old_io as io;
+use std::io;
 
-use std::old_io::{IoResult,IoError};
 use std::time::duration::Duration;
 
 use self::libc::{c_int,c_short};
@@ -45,25 +44,25 @@ extern "C" {
 }
 
 
-pub fn wait_read_fd(fd: c_int, timeout: Duration) -> IoResult<()> {
+pub fn wait_read_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
   wait_fd(fd, POLLIN, timeout)
 }
 
-pub fn wait_write_fd(fd: c_int, timeout: Duration) -> IoResult<()> {
+pub fn wait_write_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
   wait_fd(fd, POLLOUT, timeout)
 }
 
-fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> IoResult<()> {
+fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
   let mut fds = vec!(PollFd { fd: fd, events: events, revents: 0 });
 
   let wait = do_poll(&mut fds, timeout);
 
   if wait < 0 {
-    return Err(IoError::last_error());
+    return Err(io::Error::last_os_error());
   }
 
   if wait == 0 {
-    return Err(io::standard_error(io::TimedOut));
+    return Err(io::Error::new(io::ErrorKind::TimedOut, "operation timed out", None));
   }
 
   if fds[0].revents & events != 0 {
@@ -71,14 +70,14 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> IoResult<()> {
   }
 
   if fds[0].revents & POLLHUP != 0 {
-    return Err(io::standard_error(io::BrokenPipe));
+    return Err(io::Error::new(io::ErrorKind::BrokenPipe, "broken pipe", None));
   }
 
   if fds[0].revents & POLLNVAL != 0 {
-    return Err(io::standard_error(io::Closed))
+    return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid input", None))
   }
 
-  Err(io::standard_error(io::OtherIoError))
+  Err(io::Error::new(io::ErrorKind::Other, "unknown I/O error", None))
 }
 
 #[cfg(target_os = "linux")]
@@ -95,7 +94,7 @@ fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
   };
 
   unsafe {
-    ppoll(fds.as_mut_slice().as_mut_ptr(),
+    ppoll((&mut fds[..]).as_mut_ptr(),
           fds.len() as nfds_t,
           &mut timeout_ts,
           ptr::null())
@@ -106,7 +105,7 @@ fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
 #[inline]
 fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
   unsafe {
-    poll(fds.as_mut_slice().as_mut_ptr(),
+    poll((&mut fds[..]).as_mut_ptr(),
          fds.len() as nfds_t,
          timeout.num_milliseconds() as c_int)
   }
