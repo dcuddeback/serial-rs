@@ -1,0 +1,8 @@
+[package]
+
+name = "serial"
+version = "0.0.1"
+authors = ["David Cuddeback <david.cuddeback@gmail.com>"]
+
+[dependencies]
+termios = "0.0.2"
