@@ -24,17 +24,20 @@ implementations such as those for embedded systems.
 ```rust
 extern crate serial;
 
+use std::io;
+use std::path::Path;
+
 // import useful traits
 use serial::prelude::*;
 
 fn main() {
   // opening port is system-specific
-  let mut port = match serial::posix::TTYPort::open(&Path::new("/dev/ttyUSB0")).unwrap();
-  do_something(port).unwrap();
+  let mut port = serial::posix::TTYPort::open(&Path::new("/dev/ttyUSB0")).unwrap();
+  do_something(&mut port).unwrap();
 }
 
 // use SerialPort trait to program generically
-fn do_something<T: SerialPort>(port: T) -> IoError<()> {
+fn do_something<T: SerialPort>(port: &mut T) -> io::Result<()> {
   try!(port.configure(|settings| {
     settings.set_baud_rate(serial::Baud115200);
     settings.set_char_size(serial::Bits8);
@@ -43,9 +46,9 @@ fn do_something<T: SerialPort>(port: T) -> IoError<()> {
     settings.set_flow_control(serial::FlowNone);
   }));
 
-  // read and write to port using Reader and Writer traits
+  // read and write to port using Read and Write traits
   try!(port.read(...));
-  try!(port.write_all(...));
+  try!(port.write(...));
 
   Ok(())
 }
