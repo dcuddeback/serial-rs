@@ -1,4 +1,4 @@
-#![feature(std_misc,libc,io)]
+#![feature(std_misc,libc)]
 
 use std::io;
 
@@ -19,7 +19,7 @@ pub mod prelude {
 pub mod posix;
 
 
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub enum BaudRate {
   Baud50,
   Baud75,
@@ -42,7 +42,7 @@ pub enum BaudRate {
   BaudOther(usize)
 }
 
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub enum CharSize {
   Bits5,
   Bits6,
@@ -50,20 +50,20 @@ pub enum CharSize {
   Bits8
 }
 
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub enum Parity {
   ParityNone,
   ParityOdd,
   ParityEven
 }
 
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub enum StopBits {
   Stop1,
   Stop2
 }
 
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub enum FlowControl {
   FlowNone,
   FlowSoftware,
@@ -105,7 +105,7 @@ pub trait SerialPortSettings {
   fn set_flow_control(&mut self, flow_control: FlowControl);
 }
 
-#[derive(Copy)]
+#[derive(Copy,Clone)]
 pub struct PortSettings {
   pub baud_rate: BaudRate,
   pub char_size: CharSize,

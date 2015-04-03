@@ -62,7 +62,7 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
   }
 
   if wait == 0 {
-    return Err(io::Error::new(io::ErrorKind::TimedOut, "operation timed out", None));
+    return Err(io::Error::new(io::ErrorKind::TimedOut, "operation timed out"));
   }
 
   if fds[0].revents & events != 0 {
@@ -70,14 +70,14 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
   }
 
   if fds[0].revents & POLLHUP != 0 {
-    return Err(io::Error::new(io::ErrorKind::BrokenPipe, "broken pipe", None));
+    return Err(io::Error::new(io::ErrorKind::BrokenPipe, "broken pipe"));
   }
 
   if fds[0].revents & POLLNVAL != 0 {
-    return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid input", None))
+    return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid input"))
   }
 
-  Err(io::Error::new(io::ErrorKind::Other, "unknown I/O error", None))
+  Err(io::Error::new(io::ErrorKind::Other, "unknown I/O error"))
 }
 
 #[cfg(target_os = "linux")]

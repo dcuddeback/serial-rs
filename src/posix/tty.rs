@@ -4,6 +4,7 @@ extern crate termios;
 use std::io;
 
 use std::default::Default;
+use std::ffi::CString;
 use std::path::Path;
 use std::time::duration::Duration;
 
@@ -34,7 +35,7 @@ impl TTYPort {
   pub fn open(path: &Path) -> io::Result<Self> {
     use self::libc::{O_RDWR,O_NONBLOCK};
 
-    let cstr = try!(path.as_os_str().to_cstring());
+    let cstr = try!(CString::new(path.as_os_str().as_bytes()));
 
     let fd = unsafe { libc::open(cstr.as_ptr(), O_RDWR | O_NOCTTY | O_NONBLOCK, 0) };
     if fd < 0 {
@@ -153,7 +154,7 @@ impl SerialPort for TTYPort {
       ::Baud57600    => termios::ffi::B57600,
       ::Baud115200   => termios::ffi::B115200,
       ::Baud230400   => termios::ffi::B230400,
-      ::BaudOther(_) => return Err(io::Error::new(io::ErrorKind::InvalidInput, "baud rate is not supported", None))
+      ::BaudOther(_) => return Err(io::Error::new(io::ErrorKind::InvalidInput, "baud rate is not supported"))
     };
     try!(cfsetspeed(&mut termios, baud));
 
@@ -222,7 +223,7 @@ impl SerialPort for TTYPort {
   }
 }
 
-#[derive(Copy,Default)]
+#[derive(Copy,Clone,Default)]
 pub struct TTYSettings {
   serial: ::PortSettings
 }
