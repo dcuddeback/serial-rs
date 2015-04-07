@@ -1,4 +1,4 @@
-#![feature(std_misc,libc)]
+#![feature(std_misc)]
 
 use std::io;
 

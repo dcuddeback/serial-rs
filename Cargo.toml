@@ -9,4 +9,5 @@ homepage = "https://github.com/dcuddeback/serial-rs"
 repository = "https://github.com/dcuddeback/serial-rs.git"
 
 [dependencies]
-termios = "0.0.4"
+termios = "0.0.5"
+libc = "0.1.5"
