@@ -1,12 +1,13 @@
 extern crate libc;
 extern crate termios;
+extern crate time;
 
 use std::io;
 
 use std::default::Default;
 use std::ffi::CString;
 use std::path::Path;
-use std::time::duration::Duration;
+use time::Duration;
 
 use std::os::unix::prelude::OsStrExt;
 
