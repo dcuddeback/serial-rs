@@ -54,6 +54,10 @@ fn do_something<T: SerialPort>(port: &mut T) -> io::Result<()> {
 }
 ```
 
+## Contributors
+* [dcuddeback](https://github.com/dcuddeback)
+* [willem66745](https://github.com/willem66745)
+
 ## License
 Copyright © 2015 David Cuddeback
 
