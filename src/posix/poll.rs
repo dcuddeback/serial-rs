@@ -1,10 +1,11 @@
 #![allow(non_camel_case_types,dead_code)]
 
 extern crate libc;
+extern crate time;
 
 use std::io;
 
-use std::time::duration::Duration;
+use time::Duration;
 
 use self::libc::{c_int,c_short};
 

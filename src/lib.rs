@@ -1,9 +1,9 @@
-#![feature(std_misc)]
+extern crate time;
 
 use std::io;
 
 use std::default::Default;
-use std::time::duration::Duration;
+use time::Duration;
 
 pub use BaudRate::*;
 pub use CharSize::*;
