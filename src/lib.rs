@@ -18,6 +18,9 @@ pub mod prelude {
 #[cfg(unix)]
 pub mod posix;
 
+#[cfg(windows)]
+pub mod windows;
+
 
 #[derive(Copy,Clone)]
 pub enum BaudRate {
