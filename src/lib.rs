@@ -73,7 +73,7 @@ pub enum FlowControl {
 pub trait SerialPort: io::Read+io::Write {
   type Settings: SerialPortSettings;
 
-  fn settings(&self) -> Self::Settings;
+  fn settings(&self) -> io::Result<Self::Settings>;
   fn apply_settings(&mut self, settings: &Self::Settings) -> io::Result<()>;
 
   fn timeout(&self) -> Duration;
@@ -82,7 +82,7 @@ pub trait SerialPort: io::Read+io::Write {
 
 pub trait SerialPortExt: SerialPort {
   fn configure<F: FnOnce(&mut <Self as SerialPort>::Settings) -> ()>(&mut self, setup: F) -> io::Result<()> {
-    let mut settings = self.settings();
+    let mut settings = try!(self.settings());
     setup(&mut settings);
     self.apply_settings(&settings)
   }

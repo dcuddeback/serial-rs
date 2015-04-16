@@ -52,7 +52,7 @@ impl TTYPort {
     };
 
     // apply initial settings
-    let settings = port.settings();
+    let settings = try!(port.settings());
     try!(port.apply_settings(&settings));
 
     Ok(port)
@@ -104,8 +104,8 @@ impl io::Write for TTYPort {
 impl SerialPort for TTYPort {
   type Settings = TTYSettings;
 
-  fn settings(&self) -> TTYSettings {
-    self.settings
+  fn settings(&self) -> io::Result<TTYSettings> {
+    Ok(self.settings)
   }
 
   fn apply_settings(&mut self, settings: &TTYSettings) -> io::Result<()> {
