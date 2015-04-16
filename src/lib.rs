@@ -1,8 +1,9 @@
 extern crate time;
 
+use std::default::Default;
+use std::ffi::OsStr;
 use std::io;
 
-use std::default::Default;
 use time::Duration;
 
 pub use BaudRate::*;
@@ -20,6 +21,18 @@ pub mod posix;
 
 #[cfg(windows)]
 pub mod windows;
+
+
+#[cfg(windows)]
+pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<windows::COMPort> {
+    windows::COMPort::open(port)
+}
+
+#[cfg(unix)]
+pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<posix::TTYPort> {
+    use std::path::Path;
+    posix::TTYPort::open(Path::new(port))
+}
 
 
 #[derive(Copy,Clone)]
