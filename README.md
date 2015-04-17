@@ -1,7 +1,7 @@
 # Serial
-This crate provides Rust programs with access to serial ports. Serials ports are defined as traits
-to support extension through custom serial port implementations. The goals of the `serial` crate are
-to support all platforms supported by Rust. Currently, only Unix TTY devices are supported.
+The `serial` crate provides Rust programs with access to serial ports. Serial ports are defined as
+traits to support extension through custom implementations. Unix TTY devices and Windows COM ports
+are supported out of the box.
 
 ## Usage
 Add `serial` as a dependency in `Cargo.toml`:
@@ -11,46 +11,51 @@ Add `serial` as a dependency in `Cargo.toml`:
 serial = "0.0.4"
 ```
 
-Import the `serial` crate and everything from the `serial::prelude` module. The `serial::prelude`
-module contains traits that are useful to have in scope. All the traits in `prelude` begin with
-`Serial` to avoid name conflicts with other crates. Having the traits in scope avoids compiler
-errors when using serial ports.
+Import the `serial` crate and everything from the `serial::prelude` module. The traits in the
+`serial::prelude` module are are useful to have in scope when working with serial ports, and they
+are unlikely to conflict with other crates.
 
-For now, you must open a serial port using a system-specific method. Once you've opened a serial
-port, you can interact with it using the `SerialPort` and `SerialPortExt` traits. By depending on
-the traits, your code will support future implementations of serial ports, including custom
-implementations such as those for embedded systems.
+To open a serial port, call `serial::open()` with any type that's convertable to `OsStr`.  With an
+open serial port, you can interact with it using the `SerialPort` and `SerialPortExt` traits. By
+depending on the traits, your code will support future implementations of serial ports, including
+custom implementations.
 
 ```rust
 extern crate serial;
+extern crate time;
 
+use std::env;
 use std::io;
-use std::path::Path;
 
-// import useful traits
+use time::Duration;
+
+use std::io::prelude::*;
 use serial::prelude::*;
 
 fn main() {
-  // opening port is system-specific
-  let mut port = serial::posix::TTYPort::open(&Path::new("/dev/ttyUSB0")).unwrap();
-  do_something(&mut port).unwrap();
+    for arg in env::args_os().skip(1) {
+        let mut port = serial::open(&arg).unwrap();
+        interact(&mut port).unwrap();
+    }
 }
 
-// use SerialPort trait to program generically
-fn do_something<T: SerialPort>(port: &mut T) -> io::Result<()> {
-  try!(port.configure(|settings| {
-    settings.set_baud_rate(serial::Baud115200);
-    settings.set_char_size(serial::Bits8);
-    settings.set_parity(serial::ParityNone);
-    settings.set_stop_bits(serial::Stop1);
-    settings.set_flow_control(serial::FlowNone);
-  }));
+fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
+    try!(port.configure(|settings| {
+        settings.set_baud_rate(serial::Baud9600);
+        settings.set_char_size(serial::Bits8);
+        settings.set_parity(serial::ParityNone);
+        settings.set_stop_bits(serial::Stop1);
+        settings.set_flow_control(serial::FlowNone);
+    }));
 
-  // read and write to port using Read and Write traits
-  try!(port.read(...));
-  try!(port.write(...));
+    port.set_timeout(Duration::milliseconds(1000));
 
-  Ok(())
+    let mut buf: Vec<u8> = (0..255).collect();
+
+    try!(port.write(&buf[..]));
+    try!(port.read(&mut buf[..]));
+
+    Ok(())
 }
 ```
 
