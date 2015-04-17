@@ -59,6 +59,22 @@ fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
 }
 ```
 
+## Cross-Compiling
+Some of the `serial` crate's dependencies use the `gcc` crate in their build scripts, which requires
+setting environment variables to ensure they compile properly. Compiling without the environment
+variables set causes the following error when linking with the dependencies: `could not read
+symbols: File format not recognized`.
+
+To cross-compile correctly, it's necessary to set `CC` or `CC_<target>` to an appropriate
+cross-compiler in addition to providing the `--target` option to `cargo build`. The following is an
+example of cross-compiling for `arm-unknown-linux-gnueabihf` (Raspberry Pi):
+
+```
+CC_arm_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc cargo build --target=arm-unknown-linux-gnueabihf
+```
+
+See the [`gcc` crate's README](https://github.com/alexcrichton/gcc-rs) for details.
+
 ## Contributors
 * [dcuddeback](https://github.com/dcuddeback)
 * [willem66745](https://github.com/willem66745)
