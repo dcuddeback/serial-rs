@@ -122,7 +122,7 @@ impl SerialPort for TTYPort {
     use self::termios::{PARENB,PARODD,INPCK,IGNPAR}; // parity
     use self::termios::{CSTOPB}; // stop bits
     use self::termios::{IXON,IXOFF}; // flow control
-    use self::termios::ffi::{CRTSCTS}; // flow control
+    use self::termios::os::target::{CRTSCTS}; // flow control
 
     let mut termios = try!(Termios::from_fd(self.fd));
 
@@ -152,9 +152,9 @@ impl SerialPort for TTYPort {
       ::Baud9600     => termios::B9600,
       ::Baud19200    => termios::B19200,
       ::Baud38400    => termios::B38400,
-      ::Baud57600    => termios::ffi::B57600,
-      ::Baud115200   => termios::ffi::B115200,
-      ::Baud230400   => termios::ffi::B230400,
+      ::Baud57600    => termios::os::target::B57600,
+      ::Baud115200   => termios::os::target::B115200,
+      ::Baud230400   => termios::os::target::B230400,
       ::BaudOther(_) => return Err(io::Error::new(io::ErrorKind::InvalidInput, "baud rate is not supported"))
     };
     try!(cfsetspeed(&mut termios, baud));
