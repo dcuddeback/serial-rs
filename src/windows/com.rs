@@ -1,10 +1,10 @@
 extern crate libc;
 extern crate time;
 
+use std::ffi::OsStr;
 use std::io;
 use std::ptr;
 
-use std::ffi::OsStr;
 use std::os::windows::prelude::OsStrExt;
 
 use self::libc::c_void;
@@ -14,6 +14,7 @@ use super::ffi::*;
 use ::prelude::*;
 
 
+/// A serial port implementation for Windows COM ports.
 pub struct COMPort {
   handle: Handle,
   timeout: Duration,
@@ -21,6 +22,13 @@ pub struct COMPort {
 }
 
 impl COMPort {
+    /// Opens a COM port as a serial device.
+    ///
+    /// `port` should be the name of a COM port, e.g., `COM1`.
+    ///
+    /// ```no_run
+    /// serial::windows::COMPort::open("COM1").unwrap();
+    /// ```
     pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<Self> {
         let mut name: Vec<u16> = port.as_ref().encode_wide().collect();
         name.push(0);
@@ -137,6 +145,7 @@ impl SerialPort for COMPort {
 }
 
 
+/// Serial port settings for COM ports.
 #[derive(Copy,Clone,Debug)]
 pub struct COMSettings {
     inner: DCB
