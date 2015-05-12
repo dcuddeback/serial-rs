@@ -8,6 +8,7 @@ use std::ffi::CString;
 use std::path::Path;
 use time::Duration;
 
+use std::os::unix::io::{AsRawFd,RawFd};
 use std::os::unix::prelude::OsStrExt;
 
 use self::libc::{c_int,c_void,size_t};
@@ -27,7 +28,7 @@ const O_NOCTTY: c_int = 0;
 
 /// A TTY-based serial port implementation.
 pub struct TTYPort {
-  fd: c_int,
+  fd: RawFd,
   timeout: Duration
 }
 
@@ -69,6 +70,12 @@ impl Drop for TTYPort {
         unsafe {
             libc::close(self.fd);
         }
+    }
+}
+
+impl AsRawFd for TTYPort {
+    fn as_raw_fd(&self) -> RawFd {
+        self.fd
     }
 }
 
