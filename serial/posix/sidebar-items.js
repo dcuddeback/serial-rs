@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["TTYPort","A TTY-based serial port implementation."],["TTYSettings","Serial port settings for TTY devices."]]});
