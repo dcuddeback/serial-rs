@@ -323,7 +323,7 @@ pub trait SerialPortExt: SerialPort {
     /// use serial::prelude::*;
     ///
     /// fn toggle_stop_bits<T: SerialPort>(port: &mut T) -> serial::Result<()> {
-    ///     port.configure(|settings| {
+    ///     port.reconfigure(|settings| {
     ///         let stop_bits = match settings.stop_bits() {
     ///             Some(serial::Stop1)        => serial::Stop2,
     ///             Some(serial::Stop2) | None => serial::Stop1
@@ -334,7 +334,7 @@ pub trait SerialPortExt: SerialPort {
     ///     })
     /// }
     /// ```
-    fn configure<F: FnOnce(&mut <Self as SerialPort>::Settings) -> ::Result<()>>(&mut self, setup: F) -> ::Result<()> {
+    fn reconfigure<F: FnOnce(&mut <Self as SerialPort>::Settings) -> ::Result<()>>(&mut self, setup: F) -> ::Result<()> {
         let mut settings = try!(self.read_settings());
         try!(setup(&mut settings));
         self.write_settings(&settings)
