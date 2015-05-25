@@ -170,16 +170,10 @@ pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<windows::COMPort> 
 /// Serial port baud rates.
 #[derive(Debug,Copy,Clone,PartialEq,Eq)]
 pub enum BaudRate {
-    /** 50 baud. */      Baud50,
-    /** 75 baud. */      Baud75,
     /** 110 baud. */     Baud110,
-    /** 134 baud. */     Baud134,
-    /** 150 baud. */     Baud150,
-    /** 200 baud. */     Baud200,
     /** 300 baud. */     Baud300,
     /** 600 baud. */     Baud600,
     /** 1200 baud. */    Baud1200,
-    /** 1800 baud. */    Baud1800,
     /** 2400 baud. */    Baud2400,
     /** 4800 baud. */    Baud4800,
     /** 9600 baud. */    Baud9600,
@@ -187,7 +181,6 @@ pub enum BaudRate {
     /** 38,400 baud. */  Baud38400,
     /** 57,600 baud. */  Baud57600,
     /** 115,200 baud. */ Baud115200,
-    /** 230,400 baud. */ Baud230400,
 
     /// Non-standard baud rates.
     ///

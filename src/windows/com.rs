@@ -209,16 +209,10 @@ impl SerialPortSettings for COMSettings {
 
     fn set_baud_rate(&mut self, baud_rate: ::BaudRate) -> ::Result<()> {
         self.inner.BaudRate = match baud_rate {
-            ::Baud50       => 50,
-            ::Baud75       => 75,
             ::Baud110      => CBR_110,
-            ::Baud134      => 134,
-            ::Baud150      => 150,
-            ::Baud200      => 200,
             ::Baud300      => CBR_300,
             ::Baud600      => CBR_600,
             ::Baud1200     => CBR_1200,
-            ::Baud1800     => 1800,
             ::Baud2400     => CBR_2400,
             ::Baud4800     => CBR_4800,
             ::Baud9600     => CBR_9600,
@@ -226,7 +220,6 @@ impl SerialPortSettings for COMSettings {
             ::Baud38400    => CBR_38400,
             ::Baud57600    => CBR_57600,
             ::Baud115200   => CBR_115200,
-            ::Baud230400   => 230400,
             ::BaudOther(n) => n as DWORD
         };
 

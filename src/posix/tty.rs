@@ -178,16 +178,16 @@ impl SerialPortSettings for TTYSettings {
         }
 
         match ospeed {
-            B50     => Some(::Baud50),
-            B75     => Some(::Baud75),
+            B50     => Some(::BaudOther(50)),
+            B75     => Some(::BaudOther(75)),
             B110    => Some(::Baud110),
-            B134    => Some(::Baud134),
-            B150    => Some(::Baud150),
-            B200    => Some(::Baud200),
+            B134    => Some(::BaudOther(134)),
+            B150    => Some(::BaudOther(150)),
+            B200    => Some(::BaudOther(200)),
             B300    => Some(::Baud300),
             B600    => Some(::Baud600),
             B1200   => Some(::Baud1200),
-            B1800   => Some(::Baud1800),
+            B1800   => Some(::BaudOther(1800)),
             B2400   => Some(::Baud2400),
             B4800   => Some(::Baud4800),
             B9600   => Some(::Baud9600),
@@ -195,7 +195,7 @@ impl SerialPortSettings for TTYSettings {
             B38400  => Some(::Baud38400),
             B57600  => Some(::Baud57600),
             B115200 => Some(::Baud115200),
-            B230400 => Some(::Baud230400),
+            B230400 => Some(::BaudOther(230400)),
 
             _ => None
         }
@@ -262,25 +262,25 @@ impl SerialPortSettings for TTYSettings {
         use self::termios::os::target::{B57600,B115200,B230400};
 
         let baud = match baud_rate {
-            ::Baud50       => B50,
-            ::Baud75       => B75,
-            ::Baud110      => B110,
-            ::Baud134      => B134,
-            ::Baud150      => B150,
-            ::Baud200      => B200,
-            ::Baud300      => B300,
-            ::Baud600      => B600,
-            ::Baud1200     => B1200,
-            ::Baud1800     => B1800,
-            ::Baud2400     => B2400,
-            ::Baud4800     => B4800,
-            ::Baud9600     => B9600,
-            ::Baud19200    => B19200,
-            ::Baud38400    => B38400,
-            ::Baud57600    => B57600,
-            ::Baud115200   => B115200,
-            ::Baud230400   => B230400,
-            ::BaudOther(_) => return Err(::Error::new(::ErrorKind::InvalidInput, "baud rate is not supported"))
+            ::BaudOther(50)     => B50,
+            ::BaudOther(75)     => B75,
+            ::Baud110           => B110,
+            ::BaudOther(134)    => B134,
+            ::BaudOther(150)    => B150,
+            ::BaudOther(200)    => B200,
+            ::Baud300           => B300,
+            ::Baud600           => B600,
+            ::Baud1200          => B1200,
+            ::BaudOther(1800)   => B1800,
+            ::Baud2400          => B2400,
+            ::Baud4800          => B4800,
+            ::Baud9600          => B9600,
+            ::Baud19200         => B19200,
+            ::Baud38400         => B38400,
+            ::Baud57600         => B57600,
+            ::Baud115200        => B115200,
+            ::BaudOther(230400) => B230400,
+            ::BaudOther(_)      => return Err(::Error::new(::ErrorKind::InvalidInput, "baud rate is not supported"))
         };
 
         try!(cfsetspeed(&mut self.termios, baud));
