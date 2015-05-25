@@ -4,7 +4,6 @@ extern crate time;
 
 use std::io;
 
-use std::default::Default;
 use std::ffi::CString;
 use std::path::Path;
 use time::Duration;
@@ -29,8 +28,7 @@ const O_NOCTTY: c_int = 0;
 /// A TTY-based serial port implementation.
 pub struct TTYPort {
   fd: c_int,
-  timeout: Duration,
-  settings: TTYSettings
+  timeout: Duration
 }
 
 impl TTYPort {
@@ -55,15 +53,12 @@ impl TTYPort {
 
         let mut port = TTYPort {
             fd: fd,
-            timeout: Duration::milliseconds(100),
-            settings: TTYSettings {
-                serial: Default::default()
-            }
+            timeout: Duration::milliseconds(100)
         };
 
         // apply initial settings
-        let settings = try!(port.settings());
-        try!(port.apply_settings(&settings));
+        let settings = try!(port.read_settings());
+        try!(port.write_settings(&settings));
 
         Ok(port)
     }
@@ -114,27 +109,14 @@ impl io::Write for TTYPort {
 impl SerialPort for TTYPort {
     type Settings = TTYSettings;
 
-    fn settings(&self) -> io::Result<TTYSettings> {
-        Ok(self.settings)
-    }
-
-    fn apply_settings(&mut self, settings: &TTYSettings) -> io::Result<()> {
-        use self::termios::Termios;
-        use self::termios::{cfsetspeed,tcsetattr,tcflush};
-        use self::termios::{TCSANOW,TCIOFLUSH};
-
+    fn read_settings(&self) -> ::Result<TTYSettings> {
         use self::termios::{CREAD,CLOCAL}; // cflags
         use self::termios::{ICANON,ECHO,ECHOE,ECHOK,ECHONL,ISIG,IEXTEN}; // lflags
         use self::termios::{OPOST}; // oflags
         use self::termios::{INLCR,IGNCR,ICRNL,IGNBRK}; // iflags
         use self::termios::{VMIN,VTIME}; // c_cc indexes
-        use self::termios::{CS5,CS6,CS7,CS8}; // character size
-        use self::termios::{PARENB,PARODD,INPCK,IGNPAR}; // parity
-        use self::termios::{CSTOPB}; // stop bits
-        use self::termios::{IXON,IXOFF}; // flow control
-        use self::termios::os::target::{CRTSCTS}; // flow control
 
-        let mut termios = try!(Termios::from_fd(self.fd));
+        let mut termios = try!(termios::Termios::from_fd(self.fd));
 
         // setup TTY for binary serial port access
         termios.c_cflag |= CREAD | CLOCAL;
@@ -145,139 +127,346 @@ impl SerialPort for TTYPort {
         termios.c_cc[VMIN] = 0;
         termios.c_cc[VTIME] = 0;
 
-        // set baud rate
-        let baud = match settings.baud_rate() {
-            ::Baud50       => termios::B50,
-            ::Baud75       => termios::B75,
-            ::Baud110      => termios::B110,
-            ::Baud134      => termios::B134,
-            ::Baud150      => termios::B150,
-            ::Baud200      => termios::B200,
-            ::Baud300      => termios::B300,
-            ::Baud600      => termios::B600,
-            ::Baud1200     => termios::B1200,
-            ::Baud1800     => termios::B1800,
-            ::Baud2400     => termios::B2400,
-            ::Baud4800     => termios::B4800,
-            ::Baud9600     => termios::B9600,
-            ::Baud19200    => termios::B19200,
-            ::Baud38400    => termios::B38400,
-            ::Baud57600    => termios::os::target::B57600,
-            ::Baud115200   => termios::os::target::B115200,
-            ::Baud230400   => termios::os::target::B230400,
-            ::BaudOther(_) => return Err(io::Error::new(io::ErrorKind::InvalidInput, "baud rate is not supported"))
-        };
-        try!(cfsetspeed(&mut termios, baud));
+        Ok(TTYSettings::new(termios))
+    }
 
-        // set character size
-        let size = match settings.char_size() {
-            ::Bits5 => CS5,
-            ::Bits6 => CS6,
-            ::Bits7 => CS7,
-            ::Bits8 => CS8
-        };
-        termios.c_cflag |= size;
-
-        // set parity
-        match settings.parity() {
-            ::ParityNone => {
-                termios.c_cflag &= !(PARENB | PARODD);
-                termios.c_iflag &= !INPCK;
-                termios.c_iflag |= IGNPAR;
-            },
-            ::ParityOdd => {
-                termios.c_cflag |= PARENB | PARODD;
-                termios.c_iflag |= INPCK;
-                termios.c_iflag &= !IGNPAR;
-            },
-            ::ParityEven => {
-                termios.c_cflag &= !PARODD;
-                termios.c_cflag |= PARENB;
-                termios.c_iflag |= INPCK;
-                termios.c_iflag &= !IGNPAR;
-            }
-        };
-
-        // set stop bits
-        match settings.stop_bits() {
-            ::Stop1 => termios.c_cflag &= !CSTOPB,
-            ::Stop2 => termios.c_cflag |= CSTOPB
-        };
-
-        // set flow control
-        match settings.flow_control() {
-            ::FlowNone => {
-                termios.c_iflag &= !(IXON | IXOFF);
-                termios.c_cflag &= !CRTSCTS;
-            },
-            ::FlowSoftware => {
-                termios.c_iflag |= IXON | IXOFF;
-                termios.c_cflag &= !CRTSCTS;
-            },
-            ::FlowHardware => {
-                termios.c_iflag &= !(IXON | IXOFF);
-                termios.c_cflag |= CRTSCTS;
-            }
-        };
+    fn write_settings(&mut self, settings: &TTYSettings) -> ::Result<()> {
+        use self::termios::{tcsetattr,tcflush};
+        use self::termios::{TCSANOW,TCIOFLUSH};
 
         // write settings to TTY
-        try!(tcsetattr(self.fd, TCSANOW, &termios));
-        tcflush(self.fd, TCIOFLUSH)
+        try!(tcsetattr(self.fd, TCSANOW, &settings.termios));
+        try!(tcflush(self.fd, TCIOFLUSH));
+        Ok(())
     }
 
     fn timeout(&self) -> Duration {
         self.timeout
     }
 
-    fn set_timeout(&mut self, timeout: Duration) {
+    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()> {
         self.timeout = timeout;
+        Ok(())
     }
 }
 
 /// Serial port settings for TTY devices.
-#[derive(Copy,Clone,Default)]
+#[derive(Copy,Clone)]
 pub struct TTYSettings {
-    serial: ::PortSettings
+    termios: termios::Termios
+}
+
+impl TTYSettings {
+    fn new(termios: termios::Termios) -> Self {
+        TTYSettings {
+            termios: termios
+        }
+    }
 }
 
 impl SerialPortSettings for TTYSettings {
-    fn baud_rate(&self) -> ::BaudRate {
-        self.serial.baud_rate()
+    fn baud_rate(&self) -> Option<::BaudRate> {
+        use self::termios::{cfgetospeed,cfgetispeed};
+        use self::termios::{B50,B75,B110,B134,B150,B200,B300,B600,B1200,B1800,B2400,B4800,B9600,B19200,B38400};
+        use self::termios::os::target::{B57600,B115200,B230400};
+
+        let ospeed = cfgetospeed(&self.termios);
+        let ispeed = cfgetispeed(&self.termios);
+
+        if ospeed != ispeed {
+            return None
+        }
+
+        match ospeed {
+            B50     => Some(::Baud50),
+            B75     => Some(::Baud75),
+            B110    => Some(::Baud110),
+            B134    => Some(::Baud134),
+            B150    => Some(::Baud150),
+            B200    => Some(::Baud200),
+            B300    => Some(::Baud300),
+            B600    => Some(::Baud600),
+            B1200   => Some(::Baud1200),
+            B1800   => Some(::Baud1800),
+            B2400   => Some(::Baud2400),
+            B4800   => Some(::Baud4800),
+            B9600   => Some(::Baud9600),
+            B19200  => Some(::Baud19200),
+            B38400  => Some(::Baud38400),
+            B57600  => Some(::Baud57600),
+            B115200 => Some(::Baud115200),
+            B230400 => Some(::Baud230400),
+
+            _ => None
+        }
     }
 
-    fn char_size(&self) -> ::CharSize {
-        self.serial.char_size()
+    fn char_size(&self) -> Option<::CharSize> {
+        use self::termios::{CSIZE,CS5,CS6,CS7,CS8};
+
+        match self.termios.c_cflag & CSIZE {
+            CS8 => Some(::Bits8),
+            CS7 => Some(::Bits7),
+            CS6 => Some(::Bits6),
+            CS5 => Some(::Bits5),
+
+            _ => None
+        }
     }
 
-    fn parity(&self) -> ::Parity {
-        self.serial.parity()
+    fn parity(&self) -> Option<::Parity> {
+        use self::termios::{PARENB,PARODD};
+
+        if self.termios.c_cflag & PARENB != 0 {
+            if self.termios.c_cflag & PARODD != 0 {
+                Some(::ParityOdd)
+            }
+            else {
+                Some(::ParityEven)
+            }
+        }
+        else {
+            Some(::ParityNone)
+        }
     }
 
-    fn stop_bits(&self) -> ::StopBits {
-        self.serial.stop_bits()
+    fn stop_bits(&self) -> Option<::StopBits> {
+        use self::termios::{CSTOPB};
+
+        if self.termios.c_cflag & CSTOPB != 0 {
+            Some(::Stop2)
+        }
+        else {
+            Some(::Stop1)
+        }
     }
 
-    fn flow_control(&self) -> ::FlowControl {
-        self.serial.flow_control()
+    fn flow_control(&self) -> Option<::FlowControl> {
+        use self::termios::{IXON,IXOFF};
+        use self::termios::os::target::{CRTSCTS};
+
+        if self.termios.c_cflag & CRTSCTS != 0 {
+            Some(::FlowHardware)
+        }
+        else if self.termios.c_iflag & (IXON | IXOFF) != 0 {
+            Some(::FlowSoftware)
+        }
+        else {
+            Some(::FlowNone)
+        }
     }
 
-    fn set_baud_rate(&mut self, baud_rate: ::BaudRate) {
-        self.serial.set_baud_rate(baud_rate);
+    fn set_baud_rate(&mut self, baud_rate: ::BaudRate) -> ::Result<()> {
+        use self::termios::cfsetspeed;
+        use self::termios::{B50,B75,B110,B134,B150,B200,B300,B600,B1200,B1800,B2400,B4800,B9600,B19200,B38400};
+        use self::termios::os::target::{B57600,B115200,B230400};
+
+        let baud = match baud_rate {
+            ::Baud50       => B50,
+            ::Baud75       => B75,
+            ::Baud110      => B110,
+            ::Baud134      => B134,
+            ::Baud150      => B150,
+            ::Baud200      => B200,
+            ::Baud300      => B300,
+            ::Baud600      => B600,
+            ::Baud1200     => B1200,
+            ::Baud1800     => B1800,
+            ::Baud2400     => B2400,
+            ::Baud4800     => B4800,
+            ::Baud9600     => B9600,
+            ::Baud19200    => B19200,
+            ::Baud38400    => B38400,
+            ::Baud57600    => B57600,
+            ::Baud115200   => B115200,
+            ::Baud230400   => B230400,
+            ::BaudOther(_) => return Err(::Error::new(::ErrorKind::InvalidInput, "baud rate is not supported"))
+        };
+
+        try!(cfsetspeed(&mut self.termios, baud));
+        Ok(())
     }
 
     fn set_char_size(&mut self, char_size: ::CharSize) {
-        self.serial.set_char_size(char_size);
+        use self::termios::{CSIZE,CS5,CS6,CS7,CS8};
+
+        let size = match char_size {
+            ::Bits5 => CS5,
+            ::Bits6 => CS6,
+            ::Bits7 => CS7,
+            ::Bits8 => CS8
+        };
+
+        self.termios.c_cflag &= !CSIZE;
+        self.termios.c_cflag |= size;
     }
 
     fn set_parity(&mut self, parity: ::Parity) {
-        self.serial.set_parity(parity);
+        use self::termios::{PARENB,PARODD,INPCK,IGNPAR};
+
+        match parity {
+            ::ParityNone => {
+                self.termios.c_cflag &= !(PARENB | PARODD);
+                self.termios.c_iflag &= !INPCK;
+                self.termios.c_iflag |= IGNPAR;
+            },
+            ::ParityOdd => {
+                self.termios.c_cflag |= PARENB | PARODD;
+                self.termios.c_iflag |= INPCK;
+                self.termios.c_iflag &= !IGNPAR;
+            },
+            ::ParityEven => {
+                self.termios.c_cflag &= !PARODD;
+                self.termios.c_cflag |= PARENB;
+                self.termios.c_iflag |= INPCK;
+                self.termios.c_iflag &= !IGNPAR;
+            }
+        };
     }
 
     fn set_stop_bits(&mut self, stop_bits: ::StopBits) {
-        self.serial.set_stop_bits(stop_bits);
+        use self::termios::{CSTOPB};
+
+        match stop_bits {
+            ::Stop1 => self.termios.c_cflag &= !CSTOPB,
+            ::Stop2 => self.termios.c_cflag |= CSTOPB
+        };
     }
 
     fn set_flow_control(&mut self, flow_control: ::FlowControl) {
-        self.serial.set_flow_control(flow_control);
+        use self::termios::{IXON,IXOFF};
+        use self::termios::os::target::{CRTSCTS};
+
+        match flow_control {
+            ::FlowNone => {
+                self.termios.c_iflag &= !(IXON | IXOFF);
+                self.termios.c_cflag &= !CRTSCTS;
+            },
+            ::FlowSoftware => {
+                self.termios.c_iflag |= IXON | IXOFF;
+                self.termios.c_cflag &= !CRTSCTS;
+            },
+            ::FlowHardware => {
+                self.termios.c_iflag &= !(IXON | IXOFF);
+                self.termios.c_cflag |= CRTSCTS;
+            }
+        };
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use std::mem;
+
+    use super::TTYSettings;
+    use ::prelude::*;
+
+    fn default_settings() -> TTYSettings {
+        TTYSettings {
+            termios: unsafe { mem::uninitialized() }
+        }
+    }
+
+    #[test]
+    fn tty_settings_sets_baud_rate() {
+        let mut settings = default_settings();
+
+        settings.set_baud_rate(::Baud600).unwrap();
+        assert_eq!(settings.baud_rate(), Some(::Baud600));
+    }
+
+    #[test]
+    fn tty_settings_overwrites_baud_rate() {
+        let mut settings = default_settings();
+
+        settings.set_baud_rate(::Baud600).unwrap();
+        settings.set_baud_rate(::Baud1200).unwrap();
+        assert_eq!(settings.baud_rate(), Some(::Baud1200));
+    }
+
+    #[test]
+    fn tty_settings_sets_char_size() {
+        let mut settings = default_settings();
+
+        settings.set_char_size(::Bits8);
+        assert_eq!(settings.char_size(), Some(::Bits8));
+    }
+
+    #[test]
+    fn tty_settings_overwrites_char_size() {
+        let mut settings = default_settings();
+
+        settings.set_char_size(::Bits8);
+        settings.set_char_size(::Bits7);
+        assert_eq!(settings.char_size(), Some(::Bits7));
+    }
+
+    #[test]
+    fn tty_settings_sets_parity_even() {
+        let mut settings = default_settings();
+
+        settings.set_parity(::ParityEven);
+        assert_eq!(settings.parity(), Some(::ParityEven));
+    }
+
+    #[test]
+    fn tty_settings_sets_parity_odd() {
+        let mut settings = default_settings();
+
+        settings.set_parity(::ParityOdd);
+        assert_eq!(settings.parity(), Some(::ParityOdd));
+    }
+
+    #[test]
+    fn tty_settings_sets_parity_none() {
+        let mut settings = default_settings();
+
+        settings.set_parity(::ParityEven);
+        settings.set_parity(::ParityNone);
+        assert_eq!(settings.parity(), Some(::ParityNone));
+    }
+
+    #[test]
+    fn tty_settings_sets_stop_bits_1() {
+        let mut settings = default_settings();
+
+        settings.set_stop_bits(::Stop2);
+        settings.set_stop_bits(::Stop1);
+        assert_eq!(settings.stop_bits(), Some(::Stop1));
+    }
+
+    #[test]
+    fn tty_settings_sets_stop_bits_2() {
+        let mut settings = default_settings();
+
+        settings.set_stop_bits(::Stop1);
+        settings.set_stop_bits(::Stop2);
+        assert_eq!(settings.stop_bits(), Some(::Stop2));
+    }
+
+    #[test]
+    fn tty_settings_sets_flow_control_software() {
+        let mut settings = default_settings();
+
+        settings.set_flow_control(::FlowSoftware);
+        assert_eq!(settings.flow_control(), Some(::FlowSoftware));
+    }
+
+    #[test]
+    fn tty_settings_sets_flow_control_hardware() {
+        let mut settings = default_settings();
+
+        settings.set_flow_control(::FlowHardware);
+        assert_eq!(settings.flow_control(), Some(::FlowHardware));
+    }
+
+    #[test]
+    fn tty_settings_sets_flow_control_none() {
+        let mut settings = default_settings();
+
+        settings.set_flow_control(::FlowHardware);
+        settings.set_flow_control(::FlowNone);
+        assert_eq!(settings.flow_control(), Some(::FlowNone));
     }
 }

@@ -2,7 +2,6 @@ extern crate serial;
 extern crate time;
 
 use std::env;
-use std::io;
 
 use time::Duration;
 
@@ -18,16 +17,18 @@ fn main() {
     }
 }
 
-fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
+fn interact<T: SerialPort>(port: &mut T) -> serial::Result<()> {
     try!(port.configure(|settings| {
-        settings.set_baud_rate(serial::Baud9600);
+        try!(settings.set_baud_rate(serial::Baud9600));
         settings.set_char_size(serial::Bits8);
         settings.set_parity(serial::ParityNone);
         settings.set_stop_bits(serial::Stop1);
         settings.set_flow_control(serial::FlowNone);
+
+        Ok(())
     }));
 
-    port.set_timeout(Duration::milliseconds(1000));
+    try!(port.set_timeout(Duration::seconds(1)));
 
     let mut buf: Vec<u8> = (0..255).collect();
 
