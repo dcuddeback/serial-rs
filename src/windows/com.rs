@@ -3,8 +3,10 @@ extern crate time;
 
 use std::ffi::OsStr;
 use std::io;
+use std::mem;
 use std::ptr;
 
+use std::os::windows::io::{RawHandle,AsRawHandle};
 use std::os::windows::prelude::OsStrExt;
 
 use self::libc::c_void;
@@ -57,6 +59,14 @@ impl Drop for COMPort {
     fn drop(&mut self) {
         unsafe {
             CloseHandle(self.handle);
+        }
+    }
+}
+
+impl AsRawHandle for COMPort {
+    fn as_raw_handle(&self) -> RawHandle {
+        unsafe {
+            mem::transmute(self.handle)
         }
     }
 }
