@@ -11,7 +11,7 @@ Add `serial` as a dependency in `Cargo.toml`:
 
 ```toml
 [dependencies]
-serial = "0.1.0"
+serial = "0.1.1"
 ```
 
 Import the `serial` crate and everything from the `serial::prelude` module. The traits in the
