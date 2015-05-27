@@ -44,7 +44,7 @@ impl TTYPort {
     /// serial::posix::TTYPort::open(Path::new("/dev/ttyS0")).unwrap();
     /// ```
     pub fn open(path: &Path) -> io::Result<Self> {
-        use self::libc::{O_RDWR,O_NONBLOCK};
+        use self::libc::{O_RDWR,O_NONBLOCK,F_SETFL};
 
         let cstr = try!(CString::new(path.as_os_str().as_bytes()));
 
@@ -60,6 +60,11 @@ impl TTYPort {
 
         // get exclusive access to device
         try!(ioctl::tiocexcl(port.fd));
+
+        // clear O_NONBLOCK flag
+        if unsafe { libc::fcntl(port.fd, F_SETFL, 0) } < 0 {
+            return Err(io::Error::last_os_error());
+        }
 
         // apply initial settings
         let settings = try!(port.read_settings());
