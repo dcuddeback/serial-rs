@@ -1,6 +1,7 @@
 extern crate libc;
 extern crate termios;
 extern crate time;
+extern crate ioctl_rs as ioctl;
 
 use std::io;
 
@@ -56,6 +57,9 @@ impl TTYPort {
             fd: fd,
             timeout: Duration::milliseconds(100)
         };
+
+        // get exclusive access to device
+        try!(ioctl::tiocexcl(port.fd));
 
         // apply initial settings
         let settings = try!(port.read_settings());
