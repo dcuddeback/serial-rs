@@ -76,6 +76,9 @@ impl TTYPort {
 
 impl Drop for TTYPort {
     fn drop(&mut self) {
+        #![allow(unused_must_use)]
+        ioctl::tiocnxcl(self.fd);
+
         unsafe {
             libc::close(self.fd);
         }
