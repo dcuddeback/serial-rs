@@ -258,6 +258,9 @@ pub enum FlowControl {
 /// Serial port input and output is implemented through the `std::io::Read` and `std::io::Write`
 /// traits. A timeout can be set with the `set_timeout()` method and applies to all subsequent I/O
 /// operations.
+///
+/// The `SerialPort` trait exposes several common control signals. Each control signal is
+/// represented as a boolean, where `true` indicates that the signal is asserted.
 pub trait SerialPort: io::Read+io::Write {
     /// A type that implements the settings for the serial port device.
     ///
@@ -310,6 +313,70 @@ pub trait SerialPort: io::Read+io::Write {
 
         self.write_settings(&device_settings)
     }
+
+    /// Sets the state of the RTS (Request To Send) control signal.
+    ///
+    /// Setting a value of `true` asserts the RTS control signal. `false` clears the signal.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the RTS control signal could not be set to the desired
+    /// state on the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn set_rts(&mut self, level: bool) -> ::Result<()>;
+
+    /// Sets the state of the DTR (Data Terminal Ready) control signal.
+    ///
+    /// Setting a value of `true` asserts the DTR control signal. `false` clears the signal.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the DTR control signal could not be set to the desired
+    /// state on the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn set_dtr(&mut self, level: bool) -> ::Result<()>;
+
+    /// Reads the state of the CTS (Clear To Send) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the CTS control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the CTS control signal could not be read
+    /// from the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn read_cts(&mut self) -> ::Result<bool>;
+
+    /// Reads the state of the DSR (Data Set Ready) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the DSR control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the DSR control signal could not be read
+    /// from the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn read_dsr(&mut self) -> ::Result<bool>;
+
+    /// Reads the state of the RI (Ring Indicator) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the RI control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the RI control signal could not be read from
+    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    fn read_ri(&mut self) -> ::Result<bool>;
+
+    /// Reads the state of the CD (Carrier Detect) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the CD control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the CD control signal could not be read from
+    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    fn read_cd(&mut self) -> ::Result<bool>;
 }
 
 /// An extension trait that provides convenience methods for serial ports.

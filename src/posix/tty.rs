@@ -72,6 +72,22 @@ impl TTYPort {
 
         Ok(port)
     }
+
+    fn set_pin(&mut self, pin: c_int, level: bool) -> ::Result<()> {
+        if level {
+            try!(ioctl::tiocmbis(self.fd, pin));
+        }
+        else {
+            try!(ioctl::tiocmbic(self.fd, pin));
+        }
+
+        Ok(())
+    }
+
+    fn read_pin(&mut self, pin: c_int) -> ::Result<bool> {
+        let pins = try!(ioctl::tiocmget(self.fd));
+        Ok(pins & pin != 0)
+    }
 }
 
 impl Drop for TTYPort {
@@ -166,6 +182,30 @@ impl SerialPort for TTYPort {
     fn set_timeout(&mut self, timeout: Duration) -> ::Result<()> {
         self.timeout = timeout;
         Ok(())
+    }
+
+    fn set_rts(&mut self, level: bool) -> ::Result<()> {
+        self.set_pin(ioctl::TIOCM_RTS, level)
+    }
+
+    fn set_dtr(&mut self, level: bool) -> ::Result<()> {
+        self.set_pin(ioctl::TIOCM_DTR, level)
+    }
+
+    fn read_cts(&mut self) -> ::Result<bool> {
+        self.read_pin(ioctl::TIOCM_CTS)
+    }
+
+    fn read_dsr(&mut self) -> ::Result<bool> {
+        self.read_pin(ioctl::TIOCM_DSR)
+    }
+
+    fn read_ri(&mut self) -> ::Result<bool> {
+        self.read_pin(ioctl::TIOCM_RI)
+    }
+
+    fn read_cd(&mut self) -> ::Result<bool> {
+        self.read_pin(ioctl::TIOCM_CD)
     }
 }
 

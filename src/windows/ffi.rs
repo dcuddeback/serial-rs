@@ -85,6 +85,21 @@ impl DCB {
     }
 }
 
+// EscapeCommFunction values
+pub const SETXOFF:  DWORD = 1;
+pub const SETXON:   DWORD = 2;
+pub const SETRTS:   DWORD = 3;
+pub const CLRRTS:   DWORD = 4;
+pub const SETDTR:   DWORD = 5;
+pub const CLRDTR:   DWORD = 6;
+pub const SETBREAK: DWORD = 8;
+pub const CLRBREAK: DWORD = 9;
+
+// Modem status masks
+pub const MS_CTS_ON:  DWORD = 0x0010;
+pub const MS_DSR_ON:  DWORD = 0x0020;
+pub const MS_RING_ON: DWORD = 0x0040;
+pub const MS_RLSD_ON: DWORD = 0x0080;
 
 #[allow(non_snake_case)]
 #[derive(Copy,Clone,Debug)]
@@ -102,4 +117,6 @@ extern "system" {
     pub fn SetCommState(hFile: Handle, lpDCB: *const DCB) -> BOOL;
     pub fn GetCommTimeouts(hFile: Handle, lpCommTimeouts: *mut COMMTIMEOUTS) -> BOOL;
     pub fn SetCommTimeouts(hFile: Handle, lpCommTimeouts: *const COMMTIMEOUTS) -> BOOL;
+    pub fn EscapeCommFunction(hFile: Handle, dwFunc: DWORD) -> BOOL;
+    pub fn GetCommModemStatus(hFile: Handle, lpModemStat: *mut DWORD) -> BOOL;
 }

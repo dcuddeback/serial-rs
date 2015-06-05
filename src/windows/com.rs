@@ -53,6 +53,22 @@ impl COMPort {
             Err(io::Error::last_os_error())
         }
     }
+
+    fn escape_comm_function(&mut self, function: DWORD) -> ::Result<()> {
+        match unsafe { EscapeCommFunction(self.handle, function) } {
+            0 => Err(From::from(io::Error::last_os_error())),
+            _ => Ok(())
+        }
+    }
+
+    fn read_pin(&mut self, pin: DWORD) -> ::Result<bool> {
+        let mut status: DWORD = unsafe { mem::uninitialized() };
+
+        match unsafe { GetCommModemStatus(self.handle, &mut status) } {
+            0 => Err(From::from(io::Error::last_os_error())),
+            _ => Ok(status & pin != 0)
+        }
+    }
 }
 
 impl Drop for COMPort {
@@ -146,6 +162,40 @@ impl SerialPort for COMPort {
 
         self.timeout = timeout;
         Ok(())
+    }
+
+    fn set_rts(&mut self, level: bool) -> ::Result<()> {
+        if level {
+            self.escape_comm_function(SETRTS)
+        }
+        else {
+            self.escape_comm_function(CLRRTS)
+        }
+    }
+
+    fn set_dtr(&mut self, level: bool) -> ::Result<()> {
+        if level {
+            self.escape_comm_function(SETDTR)
+        }
+        else {
+            self.escape_comm_function(CLRDTR)
+        }
+    }
+
+    fn read_cts(&mut self) -> ::Result<bool> {
+        self.read_pin(MS_CTS_ON)
+    }
+
+    fn read_dsr(&mut self) -> ::Result<bool> {
+        self.read_pin(MS_DSR_ON)
+    }
+
+    fn read_ri(&mut self) -> ::Result<bool> {
+        self.read_pin(MS_RING_ON)
+    }
+
+    fn read_cd(&mut self) -> ::Result<bool> {
+        self.read_pin(MS_RLSD_ON)
     }
 }
 
