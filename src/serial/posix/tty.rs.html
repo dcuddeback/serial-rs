@@ -519,10 +519,63 @@
 <span id="477">477</span>
 <span id="478">478</span>
 <span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
 </pre><pre class='rust '>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>termios</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>ioctl_rs</span> <span class='kw'>as</span> <span class='ident'>ioctl</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 
@@ -565,7 +618,7 @@
     <span class='doccomment'>/// serial::posix::TTYPort::open(Path::new(&quot;/dev/ttyS0&quot;)).unwrap();</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open</span>(<span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='kw'>Self</span><span class='op'>&gt;</span> {
-        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>O_RDWR</span>,<span class='ident'>O_NONBLOCK</span>};
+        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>O_RDWR</span>,<span class='ident'>O_NONBLOCK</span>,<span class='ident'>F_SETFL</span>};
 
         <span class='kw'>let</span> <span class='ident'>cstr</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>path</span>.<span class='ident'>as_os_str</span>().<span class='ident'>as_bytes</span>()));
 
@@ -579,16 +632,43 @@
             <span class='ident'>timeout</span>: <span class='ident'>Duration</span>::<span class='ident'>milliseconds</span>(<span class='number'>100</span>)
         };
 
+        <span class='comment'>// get exclusive access to device</span>
+        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocexcl</span>(<span class='ident'>port</span>.<span class='ident'>fd</span>));
+
+        <span class='comment'>// clear O_NONBLOCK flag</span>
+        <span class='kw'>if</span> <span class='kw'>unsafe</span> { <span class='ident'>libc</span>::<span class='ident'>fcntl</span>(<span class='ident'>port</span>.<span class='ident'>fd</span>, <span class='ident'>F_SETFL</span>, <span class='number'>0</span>) } <span class='op'>&lt;</span> <span class='number'>0</span> {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>());
+        }
+
         <span class='comment'>// apply initial settings</span>
         <span class='kw'>let</span> <span class='ident'>settings</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>port</span>.<span class='ident'>read_settings</span>());
         <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>port</span>.<span class='ident'>write_settings</span>(<span class='kw-2'>&amp;</span><span class='ident'>settings</span>));
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>port</span>)
     }
+
+    <span class='kw'>fn</span> <span class='ident'>set_pin</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>pin</span>: <span class='ident'>c_int</span>, <span class='ident'>level</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='ident'>level</span> {
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocmbis</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>pin</span>));
+        }
+        <span class='kw'>else</span> {
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocmbic</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>pin</span>));
+        }
+
+        <span class='prelude-val'>Ok</span>(())
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>read_pin</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>pin</span>: <span class='ident'>c_int</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>pins</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocmget</span>(<span class='self'>self</span>.<span class='ident'>fd</span>));
+        <span class='prelude-val'>Ok</span>(<span class='ident'>pins</span> <span class='kw-2'>&amp;</span> <span class='ident'>pin</span> <span class='op'>!=</span> <span class='number'>0</span>)
+    }
 }
 
 <span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>TTYPort</span> {
     <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
+        <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>unused_must_use</span>)]</span>
+        <span class='ident'>ioctl</span>::<span class='ident'>tiocnxcl</span>(<span class='self'>self</span>.<span class='ident'>fd</span>);
+
         <span class='kw'>unsafe</span> {
             <span class='ident'>libc</span>::<span class='ident'>close</span>(<span class='self'>self</span>.<span class='ident'>fd</span>);
         }
@@ -676,6 +756,30 @@
     <span class='kw'>fn</span> <span class='ident'>set_timeout</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>timeout</span>: <span class='ident'>Duration</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>timeout</span> <span class='op'>=</span> <span class='ident'>timeout</span>;
         <span class='prelude-val'>Ok</span>(())
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>set_rts</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>level</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>set_pin</span>(<span class='ident'>ioctl</span>::<span class='ident'>TIOCM_RTS</span>, <span class='ident'>level</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>set_dtr</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>level</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>set_pin</span>(<span class='ident'>ioctl</span>::<span class='ident'>TIOCM_DTR</span>, <span class='ident'>level</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>read_cts</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>read_pin</span>(<span class='ident'>ioctl</span>::<span class='ident'>TIOCM_CTS</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>read_dsr</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>read_pin</span>(<span class='ident'>ioctl</span>::<span class='ident'>TIOCM_DSR</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>read_ri</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>read_pin</span>(<span class='ident'>ioctl</span>::<span class='ident'>TIOCM_RI</span>)
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>read_cd</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>read_pin</span>(<span class='ident'>ioctl</span>::<span class='ident'>TIOCM_CD</span>)
     }
 }
 
