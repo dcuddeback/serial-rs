@@ -43,7 +43,7 @@ fn main() {
 }
 
 fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
-    try!(port.reconfigure(|settings| {
+    try!(port.reconfigure(&|settings| {
         try!(settings.set_baud_rate(serial::Baud9600));
         settings.set_char_size(serial::Bits8);
         settings.set_parity(serial::ParityNone);

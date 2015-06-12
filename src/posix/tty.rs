@@ -14,7 +14,7 @@ use std::os::unix::prelude::OsStrExt;
 
 use self::libc::{c_int,c_void,size_t};
 
-use ::prelude::*;
+use ::{SerialDevice,SerialPortSettings};
 
 
 #[cfg(target_os = "linux")]
@@ -141,7 +141,7 @@ impl io::Write for TTYPort {
     }
 }
 
-impl SerialPort for TTYPort {
+impl SerialDevice for TTYPort {
     type Settings = TTYSettings;
 
     fn read_settings(&self) -> ::Result<TTYSettings> {

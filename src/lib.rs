@@ -22,7 +22,7 @@ pub use FlowControl::*;
 /// use serial::prelude::*;
 /// ```
 pub mod prelude {
-    pub use ::{SerialPort,SerialPortExt,SerialPortSettings};
+    pub use ::{SerialPort,SerialPortSettings};
 }
 
 #[cfg(unix)]
@@ -250,28 +250,41 @@ pub enum FlowControl {
     FlowHardware
 }
 
-/// A trait for serial port devices.
+/// A trait for implementing serial devices.
 ///
-/// A device's serial port settings (baud rate, parity, etc) can be configured through its
-/// `Settings` type, which hides implementation details of the serial port's native configuration.
+/// This trait is meant to be used to implement new serial port devices. To use a serial port
+/// device, the [`SerialPort`](trait.SerialPort.html) trait should be used instead. Any type that
+/// implements the `SerialDevice` trait will automatically implement the `SerialPort` trait as
+/// well.
 ///
-/// Serial port input and output is implemented through the `std::io::Read` and `std::io::Write`
-/// traits. A timeout can be set with the `set_timeout()` method and applies to all subsequent I/O
-/// operations.
+/// To implement a new serial port device, it's necessary to define a type that can manipulate the
+/// serial port device's settings (baud rate, parity mode, etc). This type is defined by the
+/// `Settings` associated type. The current settings should be determined by reading from the
+/// hardware or operating system for every call to `read_settings()`. The settings can then be
+/// manipulated in memory before being commited to the device with `write_settings()`.
 ///
-/// The `SerialPort` trait exposes several common control signals. Each control signal is
-/// represented as a boolean, where `true` indicates that the signal is asserted.
-pub trait SerialPort: io::Read+io::Write {
+/// Types that implement `SerialDevice` must also implement `std::io::Read` and `std::io::Write`.
+/// The `read()` and `write()` operations of these traits should honor the timeout that has been
+/// set with the most recent successful call to `set_timeout()`. This timeout value should also be
+/// accessible by calling the `timeout()` method.
+///
+/// Lastly, a serial port device should provide access to some basic control signals: RTS, DTR,
+/// CTS, DSR, RI, and CD. The values for the control signals are represented as boolean values,
+/// with `true` indicating the the control signal is active.
+pub trait SerialDevice: io::Read+io::Write {
     /// A type that implements the settings for the serial port device.
     ///
-    /// The `Settings` type is used to retrieve and modify the serial port's settings.
+    /// The `Settings` type is used to retrieve and modify the serial port's settings. This type
+    /// should own any native structures used to manipulate the device's settings, but it should
+    /// not cause any changes in the underlying hardware until written to the device with
+    /// `write_settings()`.
     type Settings: SerialPortSettings;
 
     /// Returns the device's current settings.
     ///
     /// This function attempts to read the current settings from the hardware. The hardware's
     /// current settings may not match the settings that were most recently written to the hardware
-    /// with `apply_settings()`.
+    /// with `write_settings()`.
     ///
     /// ## Errors
     ///
@@ -285,8 +298,8 @@ pub trait SerialPort: io::Read+io::Write {
     /// supported by the underlying hardware, in which case the result is dependent on the
     /// implementation. A successful return value does not guarantee that all settings were
     /// appliied successfully. To check which settings were applied by a successful write,
-    /// applications should use the `settings()` method to obtain the latest configuration state
-    /// from the device.
+    /// applications should use the `read_settings()` method to obtain the latest configuration
+    /// state from the device.
     ///
     /// ## Errors
     ///
@@ -300,19 +313,6 @@ pub trait SerialPort: io::Read+io::Write {
 
     /// Sets the timeout for future I/O operations.
     fn set_timeout(&mut self, timeout: Duration) -> ::Result<()>;
-
-    /// Configures a serial port device.
-    fn configure(&mut self, settings: &PortSettings) -> ::Result<()> {
-        let mut device_settings = try!(self.read_settings());
-
-        try!(device_settings.set_baud_rate(settings.baud_rate));
-        device_settings.set_char_size(settings.char_size);
-        device_settings.set_parity(settings.parity);
-        device_settings.set_stop_bits(settings.stop_bits);
-        device_settings.set_flow_control(settings.flow_control);
-
-        self.write_settings(&device_settings)
-    }
 
     /// Sets the state of the RTS (Request To Send) control signal.
     ///
@@ -379,8 +379,24 @@ pub trait SerialPort: io::Read+io::Write {
     fn read_cd(&mut self) -> ::Result<bool>;
 }
 
-/// An extension trait that provides convenience methods for serial ports.
-pub trait SerialPortExt: SerialPort {
+/// A trait for serial port devices.
+///
+/// Serial port input and output is implemented through the `std::io::Read` and `std::io::Write`
+/// traits. A timeout can be set with the `set_timeout()` method and applies to all subsequent I/O
+/// operations.
+///
+/// The `SerialPort` trait exposes several common control signals. Each control signal is
+/// represented as a boolean, where `true` indicates that the signal is asserted.
+pub trait SerialPort: io::Read+io::Write {
+    /// Returns the current timeout.
+    fn timeout(&self) -> Duration;
+
+    /// Sets the timeout for future I/O operations.
+    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()>;
+
+    /// Configures a serial port device.
+    fn configure(&mut self, settings: &PortSettings) -> ::Result<()>;
+
     /// Alter the serial port's configuration.
     ///
     /// This method expects a function, which takes a mutable reference to the serial port's
@@ -403,7 +419,7 @@ pub trait SerialPortExt: SerialPort {
     /// use serial::prelude::*;
     ///
     /// fn toggle_stop_bits<T: SerialPort>(port: &mut T) -> serial::Result<()> {
-    ///     port.reconfigure(|settings| {
+    ///     port.reconfigure(&|settings| {
     ///         let stop_bits = match settings.stop_bits() {
     ///             Some(serial::Stop1)        => serial::Stop2,
     ///             Some(serial::Stop2) | None => serial::Stop1
@@ -414,14 +430,124 @@ pub trait SerialPortExt: SerialPort {
     ///     })
     /// }
     /// ```
-    fn reconfigure<F: FnOnce(&mut <Self as SerialPort>::Settings) -> ::Result<()>>(&mut self, setup: F) -> ::Result<()> {
-        let mut settings = try!(self.read_settings());
-        try!(setup(&mut settings));
-        self.write_settings(&settings)
-    }
+    fn reconfigure(&mut self, setup: &Fn (&mut SerialPortSettings) -> ::Result<()>) -> ::Result<()>;
+
+    /// Sets the state of the RTS (Request To Send) control signal.
+    ///
+    /// Setting a value of `true` asserts the RTS control signal. `false` clears the signal.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the RTS control signal could not be set to the desired
+    /// state on the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn set_rts(&mut self, level: bool) -> ::Result<()>;
+
+    /// Sets the state of the DTR (Data Terminal Ready) control signal.
+    ///
+    /// Setting a value of `true` asserts the DTR control signal. `false` clears the signal.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the DTR control signal could not be set to the desired
+    /// state on the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn set_dtr(&mut self, level: bool) -> ::Result<()>;
+
+    /// Reads the state of the CTS (Clear To Send) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the CTS control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the CTS control signal could not be read
+    /// from the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn read_cts(&mut self) -> ::Result<bool>;
+
+    /// Reads the state of the DSR (Data Set Ready) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the DSR control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the DSR control signal could not be read
+    /// from the underlying hardware. An error could indicate that the device has been
+    /// disconnected.
+    fn read_dsr(&mut self) -> ::Result<bool>;
+
+    /// Reads the state of the RI (Ring Indicator) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the RI control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the RI control signal could not be read from
+    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    fn read_ri(&mut self) -> ::Result<bool>;
+
+    /// Reads the state of the CD (Carrier Detect) control signal.
+    ///
+    /// This function returns a boolean that indicates whether the CD control signal is asserted.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the state of the CD control signal could not be read from
+    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    fn read_cd(&mut self) -> ::Result<bool>;
 }
 
-impl<T> SerialPortExt for T where T: SerialPort { }
+impl<T> SerialPort for T where T: SerialDevice {
+    fn timeout(&self) -> Duration {
+        T::timeout(self)
+    }
+
+    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()> {
+        T::set_timeout(self, timeout)
+    }
+
+    fn configure(&mut self, settings: &PortSettings) -> ::Result<()> {
+        let mut device_settings = try!(T::read_settings(self));
+
+        try!(device_settings.set_baud_rate(settings.baud_rate));
+        device_settings.set_char_size(settings.char_size);
+        device_settings.set_parity(settings.parity);
+        device_settings.set_stop_bits(settings.stop_bits);
+        device_settings.set_flow_control(settings.flow_control);
+
+        T::write_settings(self, &device_settings)
+    }
+
+    fn reconfigure(&mut self, setup: &Fn (&mut SerialPortSettings) -> ::Result<()>) -> ::Result<()> {
+        let mut device_settings = try!(T::read_settings(self));
+        try!(setup(&mut device_settings));
+        T::write_settings(self, &device_settings)
+    }
+
+    fn set_rts(&mut self, level: bool) -> ::Result<()> {
+        T::set_rts(self, level)
+    }
+
+    fn set_dtr(&mut self, level: bool) -> ::Result<()> {
+        T::set_dtr(self, level)
+    }
+
+    fn read_cts(&mut self) -> ::Result<bool> {
+        T::read_cts(self)
+    }
+
+    fn read_dsr(&mut self) -> ::Result<bool> {
+        T::read_dsr(self)
+    }
+
+    fn read_ri(&mut self) -> ::Result<bool> {
+        T::read_ri(self)
+    }
+
+    fn read_cd(&mut self) -> ::Result<bool> {
+        T::read_cd(self)
+    }
+}
 
 /// A trait for objects that implement serial port configurations.
 pub trait SerialPortSettings {

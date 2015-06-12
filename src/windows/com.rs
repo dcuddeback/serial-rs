@@ -13,8 +13,8 @@ use self::libc::c_void;
 use time::Duration;
 
 use super::ffi::*;
-use ::prelude::*;
 
+use ::{SerialDevice,SerialPortSettings};
 
 /// A serial port implementation for Windows COM ports.
 pub struct COMPort {
@@ -123,7 +123,7 @@ impl io::Write for COMPort {
     }
 }
 
-impl SerialPort for COMPort {
+impl SerialDevice for COMPort {
     type Settings = COMSettings;
 
     fn read_settings(&self) -> ::Result<COMSettings> {
