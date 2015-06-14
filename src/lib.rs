@@ -42,9 +42,13 @@ pub type Result<T> = std::result::Result<T,::Error>;
 /// This list is intended to grow over time and it is not recommended to exhaustively match against it.
 #[derive(Debug,Clone,Copy,PartialEq,Eq)]
 pub enum ErrorKind {
-    /// A parameter was incorrect.
+    /// The device is not available.
     ///
-    /// This most likely means that a parameter is not supported by the underlying hardware.
+    /// This could indicate that the device is in use by another process or was disconnected while
+    /// performing I/O.
+    NoDevice,
+
+    /// A parameter was incorrect.
     InvalidInput,
 
     /// An I/O error occured.
@@ -88,21 +92,19 @@ impl StdError for Error {
 
 impl From<io::Error> for Error {
     fn from(io_error: io::Error) -> Error {
-        let description = io_error.description().to_string();
-
-        Error {
-            kind: ErrorKind::Io(io_error.kind()),
-            description: description
-        }
+        Error::new(ErrorKind::Io(io_error.kind()), format!("{}", io_error))
     }
 }
 
 impl From<Error> for io::Error {
     fn from(error: Error) -> io::Error {
-        match error.kind {
-            ErrorKind::Io(kind) => io::Error::new(kind, error.description),
-            ErrorKind::InvalidInput => io::Error::new(io::ErrorKind::InvalidInput, error)
-        }
+        let kind = match error.kind {
+            ErrorKind::NoDevice => io::ErrorKind::NotFound,
+            ErrorKind::InvalidInput => io::ErrorKind::InvalidInput,
+            ErrorKind::Io(kind) => kind
+        };
+
+        io::Error::new(kind, error.description)
     }
 }
 
@@ -112,6 +114,15 @@ impl From<Error> for io::Error {
 /// The argument must be one that's understood by the target operating system to identify a serial
 /// port. On Unix systems, it should be a path to a TTY device file. On Windows, it should be the
 /// name of a COM port.
+///
+/// ## Errors
+///
+/// This function returns an error if the device could not be opened and initialized:
+///
+/// * `NoDevice` if the device could not be opened. This could indicate that the device is
+///   already in use.
+/// * `InvalidInput` if `port` is not a valid device name.
+/// * `Io` for any other error while opening or initializing the device.
 ///
 /// ## Examples
 ///
@@ -132,7 +143,7 @@ impl From<Error> for io::Error {
 /// }
 /// ```
 #[cfg(unix)]
-pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<posix::TTYPort> {
+pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<posix::TTYPort> {
     use std::path::Path;
     posix::TTYPort::open(Path::new(port))
 }
@@ -142,6 +153,15 @@ pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<posix::TTYPort> {
 /// The argument must be one that's understood by the target operating system to identify a serial
 /// port. On Unix systems, it should be a path to a TTY device file. On Windows, it should be the
 /// name of a COM port.
+///
+/// ## Errors
+///
+/// This function returns an error if the device could not be opened and initialized:
+///
+/// * `NoDevice` if the device could not be opened. This could indicate that the device is
+///   already in use.
+/// * `InvalidInput` if `port` is not a valid device name.
+/// * `Io` for any other error while opening or initializing the device.
 ///
 /// ## Examples
 ///
@@ -162,7 +182,7 @@ pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<posix::TTYPort> {
 /// }
 /// ```
 #[cfg(windows)]
-pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<windows::COMPort> {
+pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<windows::COMPort> {
     windows::COMPort::open(port)
 }
 
@@ -289,7 +309,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the settings could not be read from the underlying
-    /// hardware. An error could indicate that the device has been disconnected.
+    /// hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_settings(&self) -> ::Result<Self::Settings>;
 
     /// Applies new settings to the serial device.
@@ -304,8 +327,11 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the settings could not be applied to the underlying
-    /// hardware. An error could indicate that the device has been disconnected or that the device
-    /// is not compatible with the given configuration settings.
+    /// hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `InvalidInput` if a setting is not compatible with the underlying hardware.
+    /// * `Io` for any other type of I/O error.
     fn write_settings(&mut self, settings: &Self::Settings) -> ::Result<()>;
 
     /// Returns the current timeout.
@@ -321,8 +347,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the RTS control signal could not be set to the desired
-    /// state on the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// state on the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn set_rts(&mut self, level: bool) -> ::Result<()>;
 
     /// Sets the state of the DTR (Data Terminal Ready) control signal.
@@ -332,8 +360,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the DTR control signal could not be set to the desired
-    /// state on the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// state on the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn set_dtr(&mut self, level: bool) -> ::Result<()>;
 
     /// Reads the state of the CTS (Clear To Send) control signal.
@@ -343,8 +373,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the CTS control signal could not be read
-    /// from the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// from the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_cts(&mut self) -> ::Result<bool>;
 
     /// Reads the state of the DSR (Data Set Ready) control signal.
@@ -354,8 +386,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the DSR control signal could not be read
-    /// from the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// from the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_dsr(&mut self) -> ::Result<bool>;
 
     /// Reads the state of the RI (Ring Indicator) control signal.
@@ -365,7 +399,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the RI control signal could not be read from
-    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    /// the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_ri(&mut self) -> ::Result<bool>;
 
     /// Reads the state of the CD (Carrier Detect) control signal.
@@ -375,7 +412,10 @@ pub trait SerialDevice: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the CD control signal could not be read from
-    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    /// the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_cd(&mut self) -> ::Result<bool>;
 }
 
@@ -395,6 +435,15 @@ pub trait SerialPort: io::Read+io::Write {
     fn set_timeout(&mut self, timeout: Duration) -> ::Result<()>;
 
     /// Configures a serial port device.
+    ///
+    /// ## Errors
+    ///
+    /// This function returns an error if the settings could not be applied to the underlying
+    /// hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `InvalidInput` if a setting is not compatible with the underlying hardware.
+    /// * `Io` for any other type of I/O error.
     fn configure(&mut self, settings: &PortSettings) -> ::Result<()>;
 
     /// Alter the serial port's configuration.
@@ -406,8 +455,13 @@ pub trait SerialPort: io::Read+io::Write {
     ///
     /// ## Errors
     ///
-    /// If this function encounters any kind of I/O error while reading or writing the device's
-    /// configuration settings, a `std::io::Error` will be returned.
+    /// This function returns an error if the `setup` function returns an error or if there was an
+    /// error while reading or writing the device's configuration settings:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `InvalidInput` if a setting is not compatible with the underlying hardware.
+    /// * `Io` for any other type of I/O error.
+    /// * Any error returned by the `setup` function.
     ///
     /// ## Example
     ///
@@ -439,8 +493,10 @@ pub trait SerialPort: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the RTS control signal could not be set to the desired
-    /// state on the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// state on the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn set_rts(&mut self, level: bool) -> ::Result<()>;
 
     /// Sets the state of the DTR (Data Terminal Ready) control signal.
@@ -450,8 +506,10 @@ pub trait SerialPort: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the DTR control signal could not be set to the desired
-    /// state on the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// state on the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn set_dtr(&mut self, level: bool) -> ::Result<()>;
 
     /// Reads the state of the CTS (Clear To Send) control signal.
@@ -461,8 +519,10 @@ pub trait SerialPort: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the CTS control signal could not be read
-    /// from the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// from the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_cts(&mut self) -> ::Result<bool>;
 
     /// Reads the state of the DSR (Data Set Ready) control signal.
@@ -472,8 +532,10 @@ pub trait SerialPort: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the DSR control signal could not be read
-    /// from the underlying hardware. An error could indicate that the device has been
-    /// disconnected.
+    /// from the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_dsr(&mut self) -> ::Result<bool>;
 
     /// Reads the state of the RI (Ring Indicator) control signal.
@@ -483,7 +545,10 @@ pub trait SerialPort: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the RI control signal could not be read from
-    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    /// the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_ri(&mut self) -> ::Result<bool>;
 
     /// Reads the state of the CD (Carrier Detect) control signal.
@@ -493,7 +558,10 @@ pub trait SerialPort: io::Read+io::Write {
     /// ## Errors
     ///
     /// This function returns an error if the state of the CD control signal could not be read from
-    /// the underlying hardware. An error could indicate that the device has been disconnected.
+    /// the underlying hardware:
+    ///
+    /// * `NoDevice` if the device was disconnected.
+    /// * `Io` for any other type of I/O error.
     fn read_cd(&mut self) -> ::Result<bool>;
 }
 

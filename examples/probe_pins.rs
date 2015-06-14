@@ -2,7 +2,6 @@ extern crate serial;
 extern crate time;
 
 use std::env;
-use std::io;
 use std::thread;
 
 use time::Duration;
@@ -25,7 +24,7 @@ fn main() {
     }
 }
 
-fn probe_pins<T: SerialPort>(port: &mut T) -> io::Result<()> {
+fn probe_pins<T: SerialPort>(port: &mut T) -> serial::Result<()> {
     try!(port.configure(&SETTINGS));
     try!(port.set_timeout(Duration::milliseconds(100)));
 

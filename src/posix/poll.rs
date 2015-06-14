@@ -41,31 +41,36 @@ pub fn wait_write_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
 }
 
 fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
+    use self::libc::{EINTR,EPIPE,EIO};
+
     let mut fds = vec!(PollFd { fd: fd, events: events, revents: 0 });
 
     let wait = do_poll(&mut fds, timeout);
 
     if wait < 0 {
-        return Err(io::Error::last_os_error());
+        let errno = super::error::errno();
+
+        let kind = match errno {
+            EINTR => io::ErrorKind::Interrupted,
+            _ => io::ErrorKind::Other
+        };
+
+        return Err(io::Error::new(kind, super::error::error_string(errno)));
     }
 
     if wait == 0 {
-        return Err(io::Error::new(io::ErrorKind::TimedOut, "operation timed out"));
+        return Err(io::Error::new(io::ErrorKind::TimedOut, "Operation timed out"));
     }
 
     if fds[0].revents & events != 0 {
         return Ok(());
     }
 
-    if fds[0].revents & POLLHUP != 0 {
-        return Err(io::Error::new(io::ErrorKind::BrokenPipe, "broken pipe"));
+    if fds[0].revents & (POLLHUP | POLLNVAL) != 0 {
+        return Err(io::Error::new(io::ErrorKind::BrokenPipe, super::error::error_string(EPIPE)));
     }
 
-    if fds[0].revents & POLLNVAL != 0 {
-        return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid input"))
-    }
-
-    Err(io::Error::new(io::ErrorKind::Other, "unknown I/O error"))
+    Err(io::Error::new(io::ErrorKind::Other, super::error::error_string(EIO)))
 }
 
 #[cfg(target_os = "linux")]

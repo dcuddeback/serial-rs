@@ -6,15 +6,14 @@ use std::io;
 use std::mem;
 use std::ptr;
 
-use std::os::windows::io::{RawHandle,AsRawHandle};
-use std::os::windows::prelude::OsStrExt;
+use std::os::windows::prelude::*;
 
 use self::libc::c_void;
 use time::Duration;
 
 use super::ffi::*;
-
 use ::{SerialDevice,SerialPortSettings};
+
 
 /// A serial port implementation for Windows COM ports.
 pub struct COMPort {
@@ -30,7 +29,14 @@ impl COMPort {
     /// ```no_run
     /// serial::windows::COMPort::open("COM1").unwrap();
     /// ```
-    pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> io::Result<Self> {
+    ///
+    /// ## Errors
+    ///
+    /// * `NoDevice` if the device could not be opened. This could indicate that the device is
+    ///   already in use.
+    /// * `InvalidInput` if `port` is not a valid device name.
+    /// * `Io` for any other I/O error while opening or initializing the device.
+    pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<Self> {
         let mut name: Vec<u16> = port.as_ref().encode_wide().collect();
         name.push(0);
 
@@ -50,13 +56,13 @@ impl COMPort {
             Ok(port)
         }
         else {
-            Err(io::Error::last_os_error())
+            Err(super::error::last_os_error())
         }
     }
 
     fn escape_comm_function(&mut self, function: DWORD) -> ::Result<()> {
         match unsafe { EscapeCommFunction(self.handle, function) } {
-            0 => Err(From::from(io::Error::last_os_error())),
+            0 => Err(super::error::last_os_error()),
             _ => Ok(())
         }
     }
@@ -65,7 +71,7 @@ impl COMPort {
         let mut status: DWORD = unsafe { mem::uninitialized() };
 
         match unsafe { GetCommModemStatus(self.handle, &mut status) } {
-            0 => Err(From::from(io::Error::last_os_error())),
+            0 => Err(super::error::last_os_error()),
             _ => Ok(status & pin != 0)
         }
     }
@@ -98,7 +104,7 @@ impl io::Read for COMPort {
                     Ok(len as usize)
                 }
                 else {
-                    Err(io::Error::new(io::ErrorKind::TimedOut, "operation timed out"))
+                    Err(io::Error::new(io::ErrorKind::TimedOut, "Operation timed out"))
                 }
             }
         }
@@ -130,7 +136,7 @@ impl SerialDevice for COMPort {
         let mut dcb = DCB::new();
 
         match unsafe { GetCommState(self.handle, &mut dcb) } {
-            0 => Err(From::from(io::Error::last_os_error())),
+            0 => Err(super::error::last_os_error()),
             _ => Ok(COMSettings { inner: dcb })
 
         }
@@ -138,7 +144,7 @@ impl SerialDevice for COMPort {
 
     fn write_settings(&mut self, settings: &COMSettings) -> ::Result<()> {
         match unsafe { SetCommState(self.handle, &settings.inner) } {
-            0 => Err(From::from(io::Error::last_os_error())),
+            0 => Err(super::error::last_os_error()),
             _ => Ok(())
         }
     }
@@ -157,7 +163,7 @@ impl SerialDevice for COMPort {
         };
 
         if unsafe { SetCommTimeouts(self.handle, &timeouts) } == 0 {
-            return Err(From::from(io::Error::last_os_error()));
+            return Err(super::error::last_os_error());
         }
 
         self.timeout = timeout;

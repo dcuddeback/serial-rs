@@ -3,16 +3,14 @@ extern crate termios;
 extern crate time;
 extern crate ioctl_rs as ioctl;
 
-use std::io;
-
 use std::ffi::CString;
+use std::io;
 use std::path::Path;
-use time::Duration;
 
-use std::os::unix::io::{AsRawFd,RawFd};
-use std::os::unix::prelude::OsStrExt;
+use std::os::unix::prelude::*;
 
 use self::libc::{c_int,c_void,size_t};
+use time::Duration;
 
 use ::{SerialDevice,SerialPortSettings};
 
@@ -43,14 +41,24 @@ impl TTYPort {
     ///
     /// serial::posix::TTYPort::open(Path::new("/dev/ttyS0")).unwrap();
     /// ```
-    pub fn open(path: &Path) -> io::Result<Self> {
-        use self::libc::{O_RDWR,O_NONBLOCK,F_SETFL};
+    ///
+    /// ## Errors
+    ///
+    /// * `NoDevice` if the device could not be opened. This could indicate that the device is
+    ///   already in use.
+    /// * `InvalidInput` if `port` is not a valid device name.
+    /// * `Io` for any other error while opening or initializing the device.
+    pub fn open(path: &Path) -> ::Result<Self> {
+        use self::libc::{O_RDWR,O_NONBLOCK,F_SETFL,EINVAL};
 
-        let cstr = try!(CString::new(path.as_os_str().as_bytes()));
+        let cstr = match CString::new(path.as_os_str().as_bytes()) {
+            Ok(s) => s,
+            Err(_) => return Err(super::error::from_raw_os_error(EINVAL))
+        };
 
         let fd = unsafe { libc::open(cstr.as_ptr(), O_RDWR | O_NOCTTY | O_NONBLOCK, 0) };
         if fd < 0 {
-            return Err(io::Error::last_os_error());
+            return Err(super::error::last_os_error());
         }
 
         let mut port = TTYPort {
@@ -59,11 +67,13 @@ impl TTYPort {
         };
 
         // get exclusive access to device
-        try!(ioctl::tiocexcl(port.fd));
+        if let Err(err) = ioctl::tiocexcl(port.fd) {
+            return Err(super::error::from_io_error(err))
+        }
 
         // clear O_NONBLOCK flag
         if unsafe { libc::fcntl(port.fd, F_SETFL, 0) } < 0 {
-            return Err(io::Error::last_os_error());
+            return Err(super::error::last_os_error());
         }
 
         // apply initial settings
@@ -74,19 +84,24 @@ impl TTYPort {
     }
 
     fn set_pin(&mut self, pin: c_int, level: bool) -> ::Result<()> {
-        if level {
-            try!(ioctl::tiocmbis(self.fd, pin));
+        let retval = if level {
+            ioctl::tiocmbis(self.fd, pin)
         }
         else {
-            try!(ioctl::tiocmbic(self.fd, pin));
-        }
+            ioctl::tiocmbic(self.fd, pin)
+        };
 
-        Ok(())
+        match retval {
+            Ok(()) => Ok(()),
+            Err(err) => Err(super::error::from_io_error(err))
+        }
     }
 
     fn read_pin(&mut self, pin: c_int) -> ::Result<bool> {
-        let pins = try!(ioctl::tiocmget(self.fd));
-        Ok(pins & pin != 0)
+        match ioctl::tiocmget(self.fd) {
+            Ok(pins) => Ok(pins & pin != 0),
+            Err(err) => Err(super::error::from_io_error(err))
+        }
     }
 }
 
@@ -151,7 +166,10 @@ impl SerialDevice for TTYPort {
         use self::termios::{INLCR,IGNCR,ICRNL,IGNBRK}; // iflags
         use self::termios::{VMIN,VTIME}; // c_cc indexes
 
-        let mut termios = try!(termios::Termios::from_fd(self.fd));
+        let mut termios = match termios::Termios::from_fd(self.fd) {
+            Ok(t) => t,
+            Err(e) => return Err(super::error::from_io_error(e))
+        };
 
         // setup TTY for binary serial port access
         termios.c_cflag |= CREAD | CLOCAL;
@@ -170,8 +188,14 @@ impl SerialDevice for TTYPort {
         use self::termios::{TCSANOW,TCIOFLUSH};
 
         // write settings to TTY
-        try!(tcsetattr(self.fd, TCSANOW, &settings.termios));
-        try!(tcflush(self.fd, TCIOFLUSH));
+        if let Err(err) = tcsetattr(self.fd, TCSANOW, &settings.termios) {
+            return Err(super::error::from_io_error(err));
+        }
+
+        if let Err(err) = tcflush(self.fd, TCIOFLUSH) {
+            return Err(super::error::from_io_error(err));
+        }
+
         Ok(())
     }
 
@@ -316,6 +340,7 @@ impl SerialPortSettings for TTYSettings {
     }
 
     fn set_baud_rate(&mut self, baud_rate: ::BaudRate) -> ::Result<()> {
+        use self::libc::{EINVAL};
         use self::termios::cfsetspeed;
         use self::termios::{B50,B75,B110,B134,B150,B200,B300,B600,B1200,B1800,B2400,B4800,B9600,B19200,B38400};
         use self::termios::os::target::{B57600,B115200,B230400};
@@ -339,11 +364,14 @@ impl SerialPortSettings for TTYSettings {
             ::Baud57600         => B57600,
             ::Baud115200        => B115200,
             ::BaudOther(230400) => B230400,
-            ::BaudOther(_)      => return Err(::Error::new(::ErrorKind::InvalidInput, "baud rate is not supported"))
+
+            ::BaudOther(_) => return Err(super::error::from_raw_os_error(EINVAL))
         };
 
-        try!(cfsetspeed(&mut self.termios, baud));
-        Ok(())
+        match cfsetspeed(&mut self.termios, baud) {
+            Ok(()) => Ok(()),
+            Err(err) => Err(super::error::from_io_error(err))
+        }
     }
 
     fn set_char_size(&mut self, char_size: ::CharSize) {
