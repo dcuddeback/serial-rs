@@ -1,10 +1,11 @@
 # Serial
 
-[Documentation](http://dcuddeback.github.io/serial-rs/serial/)
-
 The `serial` crate provides Rust programs with access to serial ports. Serial ports are defined as
 traits to support extension through custom implementations. Unix TTY devices and Windows COM ports
 are supported out of the box.
+
+* [Documentation](http://dcuddeback.github.io/serial-rs/serial/)
+* [Change Log](CHANGELOG.md)
 
 ## Usage
 Add `serial` as a dependency in `Cargo.toml`:
