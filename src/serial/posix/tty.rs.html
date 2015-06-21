@@ -571,24 +571,50 @@
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
 </pre><pre class='rust '>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>termios</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>ioctl_rs</span> <span class='kw'>as</span> <span class='ident'>ioctl</span>;
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>CString</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
-<span class='kw'>use</span> <span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>unix</span>::<span class='ident'>io</span>::{<span class='ident'>AsRawFd</span>,<span class='ident'>RawFd</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>unix</span>::<span class='ident'>prelude</span>::<span class='ident'>OsStrExt</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>unix</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
 
 <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>c_int</span>,<span class='ident'>c_void</span>,<span class='ident'>size_t</span>};
+<span class='kw'>use</span> <span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
-<span class='kw'>use</span> ::<span class='ident'>prelude</span>::<span class='op'>*</span>;
+<span class='kw'>use</span> ::{<span class='ident'>SerialDevice</span>,<span class='ident'>SerialPortSettings</span>};
 
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>target_os</span> <span class='op'>=</span> <span class='string'>&quot;linux&quot;</span>)]</span>
@@ -617,14 +643,24 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// serial::posix::TTYPort::open(Path::new(&quot;/dev/ttyS0&quot;)).unwrap();</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open</span>(<span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='kw'>Self</span><span class='op'>&gt;</span> {
-        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>O_RDWR</span>,<span class='ident'>O_NONBLOCK</span>,<span class='ident'>F_SETFL</span>};
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ## Errors</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// * `NoDevice` if the device could not be opened. This could indicate that the device is</span>
+    <span class='doccomment'>///   already in use.</span>
+    <span class='doccomment'>/// * `InvalidInput` if `port` is not a valid device name.</span>
+    <span class='doccomment'>/// * `Io` for any other error while opening or initializing the device.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>open</span>(<span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='kw'>Self</span><span class='op'>&gt;</span> {
+        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>O_RDWR</span>,<span class='ident'>O_NONBLOCK</span>,<span class='ident'>F_SETFL</span>,<span class='ident'>EINVAL</span>};
 
-        <span class='kw'>let</span> <span class='ident'>cstr</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>path</span>.<span class='ident'>as_os_str</span>().<span class='ident'>as_bytes</span>()));
+        <span class='kw'>let</span> <span class='ident'>cstr</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>path</span>.<span class='ident'>as_os_str</span>().<span class='ident'>as_bytes</span>()) {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>,
+            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_raw_os_error</span>(<span class='ident'>EINVAL</span>))
+        };
 
         <span class='kw'>let</span> <span class='ident'>fd</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>libc</span>::<span class='ident'>open</span>(<span class='ident'>cstr</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>O_RDWR</span> <span class='op'>|</span> <span class='ident'>O_NOCTTY</span> <span class='op'>|</span> <span class='ident'>O_NONBLOCK</span>, <span class='number'>0</span>) };
         <span class='kw'>if</span> <span class='ident'>fd</span> <span class='op'>&lt;</span> <span class='number'>0</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>());
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>last_os_error</span>());
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>port</span> <span class='op'>=</span> <span class='ident'>TTYPort</span> {
@@ -633,11 +669,13 @@
         };
 
         <span class='comment'>// get exclusive access to device</span>
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocexcl</span>(<span class='ident'>port</span>.<span class='ident'>fd</span>));
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=</span> <span class='ident'>ioctl</span>::<span class='ident'>tiocexcl</span>(<span class='ident'>port</span>.<span class='ident'>fd</span>) {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>err</span>))
+        }
 
         <span class='comment'>// clear O_NONBLOCK flag</span>
         <span class='kw'>if</span> <span class='kw'>unsafe</span> { <span class='ident'>libc</span>::<span class='ident'>fcntl</span>(<span class='ident'>port</span>.<span class='ident'>fd</span>, <span class='ident'>F_SETFL</span>, <span class='number'>0</span>) } <span class='op'>&lt;</span> <span class='number'>0</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>last_os_error</span>());
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>last_os_error</span>());
         }
 
         <span class='comment'>// apply initial settings</span>
@@ -648,19 +686,24 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>set_pin</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>pin</span>: <span class='ident'>c_int</span>, <span class='ident'>level</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>level</span> {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocmbis</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>pin</span>));
+        <span class='kw'>let</span> <span class='ident'>retval</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>level</span> {
+            <span class='ident'>ioctl</span>::<span class='ident'>tiocmbis</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>pin</span>)
         }
         <span class='kw'>else</span> {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocmbic</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>pin</span>));
-        }
+            <span class='ident'>ioctl</span>::<span class='ident'>tiocmbic</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>pin</span>)
+        };
 
-        <span class='prelude-val'>Ok</span>(())
+        <span class='kw'>match</span> <span class='ident'>retval</span> {
+            <span class='prelude-val'>Ok</span>(()) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(()),
+            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>err</span>))
+        }
     }
 
     <span class='kw'>fn</span> <span class='ident'>read_pin</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>pin</span>: <span class='ident'>c_int</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>pins</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>ioctl</span>::<span class='ident'>tiocmget</span>(<span class='self'>self</span>.<span class='ident'>fd</span>));
-        <span class='prelude-val'>Ok</span>(<span class='ident'>pins</span> <span class='kw-2'>&amp;</span> <span class='ident'>pin</span> <span class='op'>!=</span> <span class='number'>0</span>)
+        <span class='kw'>match</span> <span class='ident'>ioctl</span>::<span class='ident'>tiocmget</span>(<span class='self'>self</span>.<span class='ident'>fd</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>pins</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>pins</span> <span class='kw-2'>&amp;</span> <span class='ident'>pin</span> <span class='op'>!=</span> <span class='number'>0</span>),
+            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>err</span>))
+        }
     }
 }
 
@@ -715,7 +758,7 @@
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>SerialPort</span> <span class='kw'>for</span> <span class='ident'>TTYPort</span> {
+<span class='kw'>impl</span> <span class='ident'>SerialDevice</span> <span class='kw'>for</span> <span class='ident'>TTYPort</span> {
     <span class='kw'>type</span> <span class='ident'>Settings</span> <span class='op'>=</span> <span class='ident'>TTYSettings</span>;
 
     <span class='kw'>fn</span> <span class='ident'>read_settings</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>TTYSettings</span><span class='op'>&gt;</span> {
@@ -725,7 +768,10 @@
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>termios</span>::{<span class='ident'>INLCR</span>,<span class='ident'>IGNCR</span>,<span class='ident'>ICRNL</span>,<span class='ident'>IGNBRK</span>}; <span class='comment'>// iflags</span>
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>termios</span>::{<span class='ident'>VMIN</span>,<span class='ident'>VTIME</span>}; <span class='comment'>// c_cc indexes</span>
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>termios</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>termios</span>::<span class='ident'>Termios</span>::<span class='ident'>from_fd</span>(<span class='self'>self</span>.<span class='ident'>fd</span>));
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>termios</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>termios</span>::<span class='ident'>Termios</span>::<span class='ident'>from_fd</span>(<span class='self'>self</span>.<span class='ident'>fd</span>) {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> <span class='ident'>t</span>,
+            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>e</span>))
+        };
 
         <span class='comment'>// setup TTY for binary serial port access</span>
         <span class='ident'>termios</span>.<span class='ident'>c_cflag</span> <span class='op'>|=</span> <span class='ident'>CREAD</span> <span class='op'>|</span> <span class='ident'>CLOCAL</span>;
@@ -744,8 +790,14 @@
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>termios</span>::{<span class='ident'>TCSANOW</span>,<span class='ident'>TCIOFLUSH</span>};
 
         <span class='comment'>// write settings to TTY</span>
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>tcsetattr</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>TCSANOW</span>, <span class='kw-2'>&amp;</span><span class='ident'>settings</span>.<span class='ident'>termios</span>));
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>tcflush</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>TCIOFLUSH</span>));
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=</span> <span class='ident'>tcsetattr</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>TCSANOW</span>, <span class='kw-2'>&amp;</span><span class='ident'>settings</span>.<span class='ident'>termios</span>) {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>err</span>));
+        }
+
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=</span> <span class='ident'>tcflush</span>(<span class='self'>self</span>.<span class='ident'>fd</span>, <span class='ident'>TCIOFLUSH</span>) {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>err</span>));
+        }
+
         <span class='prelude-val'>Ok</span>(())
     }
 
@@ -890,6 +942,7 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>set_baud_rate</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>baud_rate</span>: ::<span class='ident'>BaudRate</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
+        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>EINVAL</span>};
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>termios</span>::<span class='ident'>cfsetspeed</span>;
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>termios</span>::{<span class='ident'>B50</span>,<span class='ident'>B75</span>,<span class='ident'>B110</span>,<span class='ident'>B134</span>,<span class='ident'>B150</span>,<span class='ident'>B200</span>,<span class='ident'>B300</span>,<span class='ident'>B600</span>,<span class='ident'>B1200</span>,<span class='ident'>B1800</span>,<span class='ident'>B2400</span>,<span class='ident'>B4800</span>,<span class='ident'>B9600</span>,<span class='ident'>B19200</span>,<span class='ident'>B38400</span>};
         <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>termios</span>::<span class='ident'>os</span>::<span class='ident'>target</span>::{<span class='ident'>B57600</span>,<span class='ident'>B115200</span>,<span class='ident'>B230400</span>};
@@ -913,11 +966,14 @@
             ::<span class='ident'>Baud57600</span>         <span class='op'>=&gt;</span> <span class='ident'>B57600</span>,
             ::<span class='ident'>Baud115200</span>        <span class='op'>=&gt;</span> <span class='ident'>B115200</span>,
             ::<span class='ident'>BaudOther</span>(<span class='number'>230400</span>) <span class='op'>=&gt;</span> <span class='ident'>B230400</span>,
-            ::<span class='ident'>BaudOther</span>(_)      <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>new</span>(::<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidInput</span>, <span class='string'>&quot;baud rate is not supported&quot;</span>))
+
+            ::<span class='ident'>BaudOther</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_raw_os_error</span>(<span class='ident'>EINVAL</span>))
         };
 
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>cfsetspeed</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>termios</span>, <span class='ident'>baud</span>));
-        <span class='prelude-val'>Ok</span>(())
+        <span class='kw'>match</span> <span class='ident'>cfsetspeed</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>termios</span>, <span class='ident'>baud</span>) {
+            <span class='prelude-val'>Ok</span>(()) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(()),
+            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>super</span>::<span class='ident'>error</span>::<span class='ident'>from_io_error</span>(<span class='ident'>err</span>))
+        }
     }
 
     <span class='kw'>fn</span> <span class='ident'>set_char_size</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>char_size</span>: ::<span class='ident'>CharSize</span>) {

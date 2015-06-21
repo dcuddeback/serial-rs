@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `SerialPort` trait in crate `serial`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, SerialPort">
+    <meta name="description" content="API documentation for the Rust `SerialDevice` trait in crate `serial`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, SerialDevice">
 
-    <title>serial::SerialPort - Rust</title>
+    <title>serial::SerialDevice - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../main.css">
 
@@ -26,7 +26,7 @@
 
     <section class="sidebar">
         
-        <p class='location'><a href='index.html'>serial</a></p><script>window.sidebarCurrent = {name: 'SerialPort', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='index.html'>serial</a></p><script>window.sidebarCurrent = {name: 'SerialDevice', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </section>
 
     <nav class="sub">
@@ -41,34 +41,78 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>serial</a>::<wbr><a class='trait' href=''>SerialPort</a><wbr></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>serial</a>::<wbr><a class='trait' href=''>SerialDevice</a><wbr></span><span class='out-of-band'><span id='render-detail'>
             <a id="collapse-all" href="#">[-]</a>&nbsp;<a id="expand-all" href="#">[+]</a>
-        </span><a id='src-4095' href='../src/serial/lib.rs.html#430-566'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait SerialPort: <a class='trait' href='http://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='http://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> {
+        </span><a id='src-4007' href='../src/serial/lib.rs.html#294-420'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait SerialDevice: <a class='trait' href='http://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='http://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> {
+    type Settings: <a class='trait' href='../serial/trait.SerialPortSettings.html' title='serial::SerialPortSettings'>SerialPortSettings</a>;
+
+    fn <a href='#tymethod.read_settings' class='fnname'>read_settings</a>(&amp;self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>&gt;;
+    fn <a href='#tymethod.write_settings' class='fnname'>write_settings</a>(&amp;mut self, settings: &amp;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
     fn <a href='#tymethod.timeout' class='fnname'>timeout</a>(&amp;self) -&gt; <a class='struct' href='http://doc.rust-lang.org/time/time/duration/struct.Duration.html' title='time::duration::Duration'>Duration</a>;
     fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='http://doc.rust-lang.org/time/time/duration/struct.Duration.html' title='time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
-    fn <a href='#tymethod.configure' class='fnname'>configure</a>(&amp;mut self, settings: &amp;<a class='struct' href='../serial/struct.PortSettings.html' title='serial::PortSettings'>PortSettings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
-    fn <a href='#tymethod.reconfigure' class='fnname'>reconfigure</a>(&amp;mut self, setup: &amp;<a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;mut <a class='trait' href='../serial/trait.SerialPortSettings.html' title='serial::SerialPortSettings'>SerialPortSettings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
     fn <a href='#tymethod.set_rts' class='fnname'>set_rts</a>(&amp;mut self, level: <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
     fn <a href='#tymethod.set_dtr' class='fnname'>set_dtr</a>(&amp;mut self, level: <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
     fn <a href='#tymethod.read_cts' class='fnname'>read_cts</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
     fn <a href='#tymethod.read_dsr' class='fnname'>read_dsr</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
     fn <a href='#tymethod.read_ri' class='fnname'>read_ri</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
     fn <a href='#tymethod.read_cd' class='fnname'>read_cd</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
-}</pre><div class='docblock'><p>A trait for serial port devices.</p>
+}</pre><div class='docblock'><p>A trait for implementing serial devices.</p>
 
-<p>Serial port input and output is implemented through the <code>std::io::Read</code> and <code>std::io::Write</code>
-traits. A timeout can be set with the <code>set_timeout()</code> method and applies to all subsequent I/O
-operations.</p>
+<p>This trait is meant to be used to implement new serial port devices. To use a serial port
+device, the <a href="trait.SerialPort.html"><code>SerialPort</code></a> trait should be used instead. Any type that
+implements the <code>SerialDevice</code> trait will automatically implement the <code>SerialPort</code> trait as
+well.</p>
 
-<p>The <code>SerialPort</code> trait exposes several common control signals. Each control signal is
-represented as a boolean, where <code>true</code> indicates that the signal is asserted.</p>
+<p>To implement a new serial port device, it&#39;s necessary to define a type that can manipulate the
+serial port device&#39;s settings (baud rate, parity mode, etc). This type is defined by the
+<code>Settings</code> associated type. The current settings should be determined by reading from the
+hardware or operating system for every call to <code>read_settings()</code>. The settings can then be
+manipulated in memory before being commited to the device with <code>write_settings()</code>.</p>
+
+<p>Types that implement <code>SerialDevice</code> must also implement <code>std::io::Read</code> and <code>std::io::Write</code>.
+The <code>read()</code> and <code>write()</code> operations of these traits should honor the timeout that has been
+set with the most recent successful call to <code>set_timeout()</code>. This timeout value should also be
+accessible by calling the <code>timeout()</code> method.</p>
+
+<p>Lastly, a serial port device should provide access to some basic control signals: RTS, DTR,
+CTS, DSR, RI, and CD. The values for the control signals are represented as boolean values,
+with <code>true</code> indicating the the control signal is active.</p>
 </div>
+            <h2 id='associated-types'>Associated Types</h2>
+            <div class='methods'>
+        <h3 id='associatedtype.Settings' class='method'><a class='stability Unmarked' title='No stability level'></a><code>type Settings: <a class='trait' href='../serial/trait.SerialPortSettings.html' title='serial::SerialPortSettings'>SerialPortSettings</a></code></h3><div class='docblock'><p>A type that implements the settings for the serial port device.</p>
+
+<p>The <code>Settings</code> type is used to retrieve and modify the serial port&#39;s settings. This type
+should own any native structures used to manipulate the device&#39;s settings, but it should
+not cause any changes in the underlying hardware until written to the device with
+<code>write_settings()</code>.</p>
+</div></div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.timeout' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.timeout' class='fnname'>timeout</a>(&amp;self) -&gt; <a class='struct' href='http://doc.rust-lang.org/time/time/duration/struct.Duration.html' title='time::duration::Duration'>Duration</a></code></h3><div class='docblock'><p>Returns the current timeout.</p>
-</div><h3 id='tymethod.set_timeout' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='http://doc.rust-lang.org/time/time/duration/struct.Duration.html' title='time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the timeout for future I/O operations.</p>
-</div><h3 id='tymethod.configure' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.configure' class='fnname'>configure</a>(&amp;mut self, settings: &amp;<a class='struct' href='../serial/struct.PortSettings.html' title='serial::PortSettings'>PortSettings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Configures a serial port device.</p>
+        <h3 id='tymethod.read_settings' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.read_settings' class='fnname'>read_settings</a>(&amp;self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>&gt;</code></h3><div class='docblock'><p>Returns the device&#39;s current settings.</p>
+
+<p>This function attempts to read the current settings from the hardware. The hardware&#39;s
+current settings may not match the settings that were most recently written to the hardware
+with <code>write_settings()</code>.</p>
+
+<h2 id="errors" class='section-header'><a
+                           href="#errors">Errors</a></h2>
+<p>This function returns an error if the settings could not be read from the underlying
+hardware:</p>
+
+<ul>
+<li><code>NoDevice</code> if the device was disconnected.</li>
+<li><code>Io</code> for any other type of I/O error.</li>
+</ul>
+</div><h3 id='tymethod.write_settings' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.write_settings' class='fnname'>write_settings</a>(&amp;mut self, settings: &amp;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Applies new settings to the serial device.</p>
+
+<p>This function attempts to apply all settings to the serial device. Some settings may not be
+supported by the underlying hardware, in which case the result is dependent on the
+implementation. A successful return value does not guarantee that all settings were
+appliied successfully. To check which settings were applied by a successful write,
+applications should use the <code>read_settings()</code> method to obtain the latest configuration
+state from the device.</p>
 
 <h2 id="errors" class='section-header'><a
                            href="#errors">Errors</a></h2>
@@ -80,45 +124,8 @@ hardware:</p>
 <li><code>InvalidInput</code> if a setting is not compatible with the underlying hardware.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.reconfigure' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.reconfigure' class='fnname'>reconfigure</a>(&amp;mut self, setup: &amp;<a class='trait' href='http://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;mut <a class='trait' href='../serial/trait.SerialPortSettings.html' title='serial::SerialPortSettings'>SerialPortSettings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Alter the serial port&#39;s configuration.</p>
-
-<p>This method expects a function, which takes a mutable reference to the serial port&#39;s
-configuration settings. The serial port&#39;s current settings, read from the device, are
-yielded to the provided function. After the function returns, any changes made to the
-settings object will be written back to the device.</p>
-
-<h2 id="errors" class='section-header'><a
-                           href="#errors">Errors</a></h2>
-<p>This function returns an error if the <code>setup</code> function returns an error or if there was an
-error while reading or writing the device&#39;s configuration settings:</p>
-
-<ul>
-<li><code>NoDevice</code> if the device was disconnected.</li>
-<li><code>InvalidInput</code> if a setting is not compatible with the underlying hardware.</li>
-<li><code>Io</code> for any other type of I/O error.</li>
-<li>Any error returned by the <code>setup</code> function.</li>
-</ul>
-
-<h2 id="example" class='section-header'><a
-                           href="#example">Example</a></h2>
-<p>The following is a function that toggles a serial port&#39;s settings between one and two stop
-bits:</p>
-<pre id='rust-example-rendered' class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>serial</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
-
-<span class='kw'>fn</span> <span class='ident'>toggle_stop_bits</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>SerialPort</span><span class='op'>&gt;</span>(<span class='ident'>port</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>serial</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-    <span class='ident'>port</span>.<span class='ident'>reconfigure</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>settings</span><span class='op'>|</span> {
-        <span class='kw'>let</span> <span class='ident'>stop_bits</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>settings</span>.<span class='ident'>stop_bits</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>serial</span>::<span class='ident'>Stop1</span>)        <span class='op'>=&gt;</span> <span class='ident'>serial</span>::<span class='ident'>Stop2</span>,
-            <span class='prelude-val'>Some</span>(<span class='ident'>serial</span>::<span class='ident'>Stop2</span>) <span class='op'>|</span> <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>serial</span>::<span class='ident'>Stop1</span>
-        };
-
-        <span class='ident'>settings</span>.<span class='ident'>set_stop_bits</span>(<span class='ident'>stop_bits</span>);
-        <span class='prelude-val'>Ok</span>(())
-    })
-}
-</pre>
+</div><h3 id='tymethod.timeout' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.timeout' class='fnname'>timeout</a>(&amp;self) -&gt; <a class='struct' href='http://doc.rust-lang.org/time/time/duration/struct.Duration.html' title='time::duration::Duration'>Duration</a></code></h3><div class='docblock'><p>Returns the current timeout.</p>
+</div><h3 id='tymethod.set_timeout' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='http://doc.rust-lang.org/time/time/duration/struct.Duration.html' title='time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the timeout for future I/O operations.</p>
 </div><h3 id='tymethod.set_rts' class='method'><a class='stability Unmarked' title='No stability level'></a><code>fn <a href='#tymethod.set_rts' class='fnname'>set_rts</a>(&amp;mut self, level: <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the state of the RTS (Request To Send) control signal.</p>
 
 <p>Setting a value of <code>true</code> asserts the RTS control signal. <code>false</code> clears the signal.</p>
@@ -200,9 +207,9 @@ the underlying hardware:</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><a class='stability Unmarked' title='No stability level'></a><code>impl&lt;T&gt; <a class='trait' href='../serial/trait.SerialPort.html' title='serial::SerialPort'>SerialPort</a> for T <span class='where'>where T: <a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>SerialDevice</a></span></code></li>
+    <li><a class='stability Unmarked' title='No stability level'></a><code>impl <a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>SerialDevice</a> for <a class='struct' href='../serial/posix/struct.TTYPort.html' title='serial::posix::TTYPort'>TTYPort</a></code></li>
 </ul><script type="text/javascript" async
-                              src="../implementors/serial/trait.SerialPort.js">
+                              src="../implementors/serial/trait.SerialDevice.js">
                       </script></section>
     <section id='search' class="content hidden"></section>
 
