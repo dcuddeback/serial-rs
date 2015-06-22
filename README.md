@@ -20,9 +20,8 @@ Import the `serial` crate and everything from the `serial::prelude` module. The 
 are unlikely to conflict with other crates.
 
 To open a serial port, call `serial::open()` with any type that's convertable to `OsStr`.  With an
-open serial port, you can interact with it using the `SerialPort` and `SerialPortExt` traits. By
-depending on the traits, your code will support future implementations of serial ports, including
-custom implementations.
+open serial port, you can interact with it using the `SerialPort` trait. By depending on the traits,
+your code will support future implementations of serial ports, including custom implementations.
 
 ```rust
 extern crate serial;
