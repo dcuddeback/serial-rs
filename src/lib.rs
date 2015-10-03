@@ -108,6 +108,13 @@ impl From<Error> for io::Error {
     }
 }
 
+/// A convenience type alias for the system's native serial port type.
+#[cfg(unix)]
+pub type SystemPort = posix::TTYPort;
+
+/// A convenience type alias for the system's native serial port type.
+#[cfg(windows)]
+pub type SystemPort = windows::COMPort;
 
 /// A convenience function for opening a native serial port.
 ///
@@ -143,7 +150,7 @@ impl From<Error> for io::Error {
 /// }
 /// ```
 #[cfg(unix)]
-pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<posix::TTYPort> {
+pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<SystemPort> {
     use std::path::Path;
     posix::TTYPort::open(Path::new(port))
 }
@@ -182,7 +189,7 @@ pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<posix::TTYPort> {
 /// }
 /// ```
 #[cfg(windows)]
-pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<windows::COMPort> {
+pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<SystemPort> {
     windows::COMPort::open(port)
 }
 
