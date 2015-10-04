@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.2.1 (2015-10-03)
+### Added
+* ([#7](https://github.com/dcuddeback/serial-rs/issues/7))
+  Added `SystemPort` type alias for native serial port type.
+
 ## 0.2.0 (2015-06-21)
 ### Added
 * Added `SerialDevice` trait as implementation trait for new serial port types. All types that
