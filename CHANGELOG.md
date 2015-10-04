@@ -72,7 +72,8 @@
 ## 0.0.4 (2015-04-12)
 ### Changed
 * Replaced use of built-in `libc` crate with `libc` package from crates.io.
-* Replaced use of unstable `std::time` module with `time` package from crates.io.
+* ([#1](https://github.com/dcuddeback/serial-rs/issues/1))
+  Replaced use of unstable `std::time` module with `time` package from crates.io.
 
 ### Fixed
 * Updated to support Rust 1.0.0-beta compiler.
