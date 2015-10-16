@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.3.0 (2015-10-15)
+### Added
+* Added support for FreeBSD.
+
+### Changed
+* Replaced dependence on `time` crate with `std::time`.
+* Minimum supported version of Rust is now 1.3.0.
+
 ## 0.2.1 (2015-10-03)
 ### Added
 * ([#7](https://github.com/dcuddeback/serial-rs/issues/7))
