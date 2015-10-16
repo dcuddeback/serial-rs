@@ -1,15 +1,14 @@
 extern crate libc;
-extern crate time;
 
 use std::ffi::OsStr;
 use std::io;
 use std::mem;
 use std::ptr;
+use std::time::Duration;
 
 use std::os::windows::prelude::*;
 
 use self::libc::c_void;
-use time::Duration;
 
 use super::ffi::*;
 use ::{SerialDevice,SerialPortSettings};
@@ -44,7 +43,7 @@ impl COMPort {
             CreateFileW(name.as_ptr(), GENERIC_READ | GENERIC_WRITE, 0, ptr::null_mut(), OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 as Handle)
         };
 
-        let timeout = Duration::milliseconds(100);
+        let timeout = Duration::from_millis(100);
 
         if handle != INVALID_HANDLE_VALUE {
             let mut port = COMPort {
@@ -154,10 +153,12 @@ impl SerialDevice for COMPort {
     }
 
     fn set_timeout(&mut self, timeout: Duration) -> ::Result<()> {
+        let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
+
         let timeouts = COMMTIMEOUTS {
             ReadIntervalTimeout: 0,
             ReadTotalTimeoutMultiplier: 0,
-            ReadTotalTimeoutConstant: timeout.num_milliseconds() as DWORD,
+            ReadTotalTimeoutConstant: milliseconds as DWORD,
             WriteTotalTimeoutMultiplier: 0,
             WriteTotalTimeoutConstant: 0
         };

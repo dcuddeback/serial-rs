@@ -1,14 +1,11 @@
 #![allow(non_camel_case_types,dead_code)]
 
 extern crate libc;
-extern crate time;
 
 use std::io;
-
-use time::Duration;
+use std::time::Duration;
 
 use self::libc::{c_int,c_short};
-
 
 #[cfg(target_os = "linux")]
 type nfds_t = libc::c_ulong;
@@ -85,12 +82,9 @@ fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
         fn ppoll(fds: *mut PollFd, nfds: nfds_t, timeout_ts: *mut self::libc::timespec, sigmask: *const sigset_t) -> c_int;
     }
 
-    let seconds     = timeout.num_seconds();
-    let nanoseconds = ((timeout - Duration::seconds(seconds)) * 1_000_000_000).num_seconds();
-
     let mut timeout_ts = self::libc::timespec {
-        tv_sec: seconds as libc::time_t,
-        tv_nsec: nanoseconds as libc::c_long
+        tv_sec: timeout.as_secs() as libc::time_t,
+        tv_nsec: timeout.subsec_nanos() as libc::c_long,
     };
 
     unsafe {
@@ -108,9 +102,11 @@ fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
         fn poll(fds: *mut PollFd, nfds: nfds_t, timeout: c_int) -> c_int;
     }
 
+    let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
+
     unsafe {
         poll((&mut fds[..]).as_mut_ptr(),
              fds.len() as nfds_t,
-             timeout.num_milliseconds() as c_int)
+             milliseconds as c_int)
     }
 }

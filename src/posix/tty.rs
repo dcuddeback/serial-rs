@@ -1,16 +1,15 @@
 extern crate libc;
 extern crate termios;
-extern crate time;
 extern crate ioctl_rs as ioctl;
 
 use std::ffi::CString;
 use std::io;
 use std::path::Path;
+use std::time::Duration;
 
 use std::os::unix::prelude::*;
 
 use self::libc::{c_int,c_void,size_t};
-use time::Duration;
 
 use ::{SerialDevice,SerialPortSettings};
 
@@ -63,7 +62,7 @@ impl TTYPort {
 
         let mut port = TTYPort {
             fd: fd,
-            timeout: Duration::milliseconds(100)
+            timeout: Duration::from_millis(100)
         };
 
         // get exclusive access to device

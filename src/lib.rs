@@ -1,12 +1,10 @@
-extern crate time;
-
 use std::default::Default;
 use std::error::Error as StdError;
 use std::ffi::OsStr;
 use std::fmt;
 use std::io;
+use std::time::Duration;
 
-use time::Duration;
 
 pub use BaudRate::*;
 pub use CharSize::*;

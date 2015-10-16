@@ -11,7 +11,6 @@ documentation = "https://dcuddeback.github.io/serial-rs/serial/"
 
 [dependencies]
 libc = "0.1.8"
-time = "0.1.25"
 
 [target.aarch64-unknown-linux-gnu.dependencies]
 termios = "0.2.0"

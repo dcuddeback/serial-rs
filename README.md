@@ -25,12 +25,10 @@ your code will support future implementations of serial ports, including custom 
 
 ```rust
 extern crate serial;
-extern crate time;
 
 use std::env;
 use std::io;
-
-use time::Duration;
+use std::time::Duration;
 
 use std::io::prelude::*;
 use serial::prelude::*;
@@ -52,7 +50,7 @@ fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
         Ok(())
     }));
 
-    try!(port.set_timeout(Duration::milliseconds(1000)));
+    try!(port.set_timeout(Duration::from_millis(1000)));
 
     let mut buf: Vec<u8> = (0..255).collect();
 
