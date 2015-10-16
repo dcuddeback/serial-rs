@@ -7,6 +7,17 @@ are supported out of the box.
 * [Documentation](http://dcuddeback.github.io/serial-rs/serial/)
 * [Change Log](CHANGELOG.md)
 
+## Compatibility
+The `serial` crate is compatible with Windows and any Unix operating system that implements the
+termios API. The following platforms are confirmed to be compatible:
+
+* Linux (x86_64, armv6l)
+* OS X (x86_64)
+* FreeBSD (amd64)
+* Windows (x86_64)
+
+Compiling the `serial` crate requires Rust 1.3 or later.
+
 ## Usage
 Add `serial` as a dependency in `Cargo.toml`:
 
