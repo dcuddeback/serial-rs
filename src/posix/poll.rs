@@ -75,8 +75,12 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
 fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
     use std::ptr;
 
+    use self::libc::{c_void};
+
     #[repr(C)]
-    struct sigset_t;
+    struct sigset_t {
+        __private: c_void
+    }
 
     extern "C" {
         fn ppoll(fds: *mut PollFd, nfds: nfds_t, timeout_ts: *mut self::libc::timespec, sigmask: *const sigset_t) -> c_int;
