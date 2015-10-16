@@ -1,13 +1,14 @@
 [package]
-
 name = "serial"
 version = "0.2.1"
 authors = ["David Cuddeback <david.cuddeback@gmail.com>"]
 description = "Rust library for accessing serial ports."
-license = "MIT"
 homepage = "https://github.com/dcuddeback/serial-rs"
 repository = "https://github.com/dcuddeback/serial-rs"
 documentation = "https://dcuddeback.github.io/serial-rs/serial/"
+license = "MIT"
+readme = "README.md"
+keywords = ["serial", "hardware", "system", "RS232"]
 
 [dependencies]
 libc = "0.1.8"
