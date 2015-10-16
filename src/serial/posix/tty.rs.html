@@ -598,21 +598,19 @@
 <span id="556">556</span>
 <span id="557">557</span>
 <span id="558">558</span>
-<span id="559">559</span>
 </pre><pre class='rust '>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>termios</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>ioctl_rs</span> <span class='kw'>as</span> <span class='ident'>ioctl</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>CString</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>unix</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
 
 <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>libc</span>::{<span class='ident'>c_int</span>,<span class='ident'>c_void</span>,<span class='ident'>size_t</span>};
-<span class='kw'>use</span> <span class='ident'>time</span>::<span class='ident'>Duration</span>;
 
 <span class='kw'>use</span> ::{<span class='ident'>SerialDevice</span>,<span class='ident'>SerialPortSettings</span>};
 
@@ -665,7 +663,7 @@
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>port</span> <span class='op'>=</span> <span class='ident'>TTYPort</span> {
             <span class='ident'>fd</span>: <span class='ident'>fd</span>,
-            <span class='ident'>timeout</span>: <span class='ident'>Duration</span>::<span class='ident'>milliseconds</span>(<span class='number'>100</span>)
+            <span class='ident'>timeout</span>: <span class='ident'>Duration</span>::<span class='ident'>from_millis</span>(<span class='number'>100</span>)
         };
 
         <span class='comment'>// get exclusive access to device</span>
