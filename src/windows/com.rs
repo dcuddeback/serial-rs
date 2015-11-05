@@ -16,7 +16,7 @@ use ::{SerialDevice,SerialPortSettings};
 
 /// A serial port implementation for Windows COM ports.
 pub struct COMPort {
-    handle: Handle,
+    handle: HANDLE,
     timeout: Duration
 }
 
@@ -40,7 +40,7 @@ impl COMPort {
         name.push(0);
 
         let handle = unsafe {
-            CreateFileW(name.as_ptr(), GENERIC_READ | GENERIC_WRITE, 0, ptr::null_mut(), OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 as Handle)
+            CreateFileW(name.as_ptr(), GENERIC_READ | GENERIC_WRITE, 0, ptr::null_mut(), OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 as HANDLE)
         };
 
         let timeout = Duration::from_millis(100);

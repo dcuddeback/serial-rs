@@ -1,17 +1,51 @@
-#![allow(non_upper_case_globals,dead_code)]
+#![allow(non_snake_case,non_camel_case_types,non_upper_case_globals,dead_code)]
 
 extern crate libc;
 
 use std::mem;
 
-pub use self::libc::{c_char,BYTE,WORD,DWORD,BOOL};
-pub use self::libc::{GENERIC_READ,GENERIC_WRITE,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,INVALID_HANDLE_VALUE};
-pub use self::libc::{CreateFileW,CloseHandle,ReadFile,WriteFile,FlushFileBuffers};
+use self::libc::{c_void,c_char,c_int,c_ulong,wchar_t};
 
+pub type BYTE = u8;
+pub type WORD = u16;
+pub type DWORD = c_ulong;
+pub type BOOL = c_int;
+pub type WCHAR = wchar_t;
 
-pub type Handle = self::libc::HANDLE;
+pub type LPDWORD = *mut DWORD;
+pub type LPVOID = *mut c_void;
 
-#[allow(non_snake_case)]
+pub type LPCWSTR = *const WCHAR;
+pub type LPWSTR = *mut WCHAR;
+
+pub type HANDLE = *mut LPVOID;
+
+pub const GENERIC_READ: DWORD = 0x80000000;
+pub const GENERIC_WRITE: DWORD = 0x40000000;
+pub const OPEN_EXISTING: DWORD = 3;
+pub const FILE_ATTRIBUTE_NORMAL: DWORD = 0x80;
+pub const INVALID_HANDLE_VALUE: HANDLE = !0 as HANDLE;
+
+#[repr(C)]
+pub struct SECURITY_ATTRIBUTES {
+    pub nLength: DWORD,
+    pub lpSecurityDescriptor: LPVOID,
+    pub bInheritHandle: BOOL,
+}
+
+pub type LPSECURITY_ATTRIBUTES = *mut SECURITY_ATTRIBUTES;
+
+#[repr(C)]
+pub struct OVERLAPPED {
+    pub Internal: *mut c_ulong,
+    pub InternalHigh: *mut c_ulong,
+    pub Offset: DWORD,
+    pub OffsetHigh: DWORD,
+    pub hEvent: HANDLE,
+}
+
+pub type LPOVERLAPPED = *mut OVERLAPPED;
+
 #[derive(Copy,Clone,Debug)]
 #[repr(C)]
 pub struct DCB {
@@ -101,7 +135,6 @@ pub const MS_DSR_ON:  DWORD = 0x0020;
 pub const MS_RING_ON: DWORD = 0x0040;
 pub const MS_RLSD_ON: DWORD = 0x0080;
 
-#[allow(non_snake_case)]
 #[derive(Copy,Clone,Debug)]
 #[repr(C)]
 pub struct COMMTIMEOUTS {
@@ -113,10 +146,32 @@ pub struct COMMTIMEOUTS {
 }
 
 extern "system" {
-    pub fn GetCommState(hFile: Handle, lpDCB: *mut DCB) -> BOOL;
-    pub fn SetCommState(hFile: Handle, lpDCB: *const DCB) -> BOOL;
-    pub fn GetCommTimeouts(hFile: Handle, lpCommTimeouts: *mut COMMTIMEOUTS) -> BOOL;
-    pub fn SetCommTimeouts(hFile: Handle, lpCommTimeouts: *const COMMTIMEOUTS) -> BOOL;
-    pub fn EscapeCommFunction(hFile: Handle, dwFunc: DWORD) -> BOOL;
-    pub fn GetCommModemStatus(hFile: Handle, lpModemStat: *mut DWORD) -> BOOL;
+    pub fn CreateFileW(lpFileName: LPCWSTR,
+                       dwDesiredAccess: DWORD,
+                       dwSharedMode: DWORD,
+                       lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
+                       dwCreationDisposition: DWORD,
+                       dwFlagsAndAttributes: DWORD,
+                       hTemplmateFile: HANDLE) -> HANDLE;
+    pub fn CloseHandle(hObject: HANDLE) -> BOOL;
+    pub fn ReadFile(hFile: HANDLE,
+                    lpBuffer: LPVOID,
+                    nNumberOfBytesToRead: DWORD,
+                    lpNumberOfBytesRead: LPDWORD,
+                    lpOverlapped: LPOVERLAPPED) -> BOOL;
+    pub fn WriteFile(hFile: HANDLE,
+                     lpBuffer: LPVOID,
+                     nNumberOfBytesToWrite: DWORD,
+                     lpNumberOfBytesWritten: LPDWORD,
+                     lpOverlapped: LPOVERLAPPED) -> BOOL;
+    pub fn FlushFileBuffers(hFile: HANDLE) -> BOOL;
+
+    pub fn GetCommState(hFile: HANDLE, lpDCB: *mut DCB) -> BOOL;
+    pub fn SetCommState(hFile: HANDLE, lpDCB: *const DCB) -> BOOL;
+    pub fn GetCommTimeouts(hFile: HANDLE, lpCommTimeouts: *mut COMMTIMEOUTS) -> BOOL;
+    pub fn SetCommTimeouts(hFile: HANDLE, lpCommTimeouts: *const COMMTIMEOUTS) -> BOOL;
+    pub fn EscapeCommFunction(hFile: HANDLE, dwFunc: DWORD) -> BOOL;
+    pub fn GetCommModemStatus(hFile: HANDLE, lpModemStat: *mut DWORD) -> BOOL;
+
+    pub fn GetLastError() -> DWORD;
 }

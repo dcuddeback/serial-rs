@@ -5,12 +5,11 @@ use std::ptr;
 
 use self::libc::{c_void,c_int};
 
-// missing from libc
+const ERROR_FILE_NOT_FOUND: c_int = 2;
 const ERROR_PATH_NOT_FOUND: c_int = 3;
+const ERROR_ACCESS_DENIED: c_int = 5;
 
 pub fn last_os_error() -> ::Error {
-    use self::libc::{ERROR_FILE_NOT_FOUND,ERROR_ACCESS_DENIED};
-
     let errno = errno();
 
     let kind = match errno {
@@ -24,16 +23,15 @@ pub fn last_os_error() -> ::Error {
 // the rest of this module is borrowed from libstd
 
 fn errno() -> i32 {
-    unsafe { libc::GetLastError() as i32 }
+    unsafe {
+        super::ffi::GetLastError() as i32
+    }
 }
 
 fn error_string(errnum: i32) -> String {
     #![allow(non_snake_case)]
 
-    use self::libc::types::os::arch::extra::DWORD;
-    use self::libc::types::os::arch::extra::LPWSTR;
-    use self::libc::types::os::arch::extra::LPVOID;
-    use self::libc::types::os::arch::extra::WCHAR;
+    use super::ffi::{DWORD,LPWSTR,LPVOID,WCHAR};
 
     #[link_name = "kernel32"]
     extern "system" {
