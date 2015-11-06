@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.2 (2015-11-05)
+### Changed
+* Upgraded `libc` dependency to v0.2.
+
 ## 0.3.0 (2015-10-15)
 ### Added
 * Added support for FreeBSD.

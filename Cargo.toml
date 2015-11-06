@@ -1,6 +1,6 @@
 [package]
 name = "serial"
-version = "0.3.1"
+version = "0.3.2"
 authors = ["David Cuddeback <david.cuddeback@gmail.com>"]
 description = "Rust library for accessing serial ports."
 homepage = "https://github.com/dcuddeback/serial-rs"
