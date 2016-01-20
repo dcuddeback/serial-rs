@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use std::os::unix::prelude::*;
 
-use self::libc::{c_int,c_void,size_t};
+use self::libc::{c_int,c_char,c_void,size_t};
 
 use ::{SerialDevice,SerialPortSettings};
 
@@ -55,7 +55,7 @@ impl TTYPort {
             Err(_) => return Err(super::error::from_raw_os_error(EINVAL))
         };
 
-        let fd = unsafe { libc::open(cstr.as_ptr(), O_RDWR | O_NOCTTY | O_NONBLOCK, 0) };
+        let fd = unsafe { libc::open(cstr.as_ptr() as *const c_char, O_RDWR | O_NOCTTY | O_NONBLOCK, 0) };
         if fd < 0 {
             return Err(super::error::last_os_error());
         }
