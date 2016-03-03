@@ -193,6 +193,13 @@ pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<SystemPort> {
 
 
 /// Serial port baud rates.
+///
+/// ## Portability
+///
+/// The `BaudRate` variants with numeric suffixes, e.g., `Baud9600`, indicate standard baud rates
+/// that are widely-supported on many systems. While non-standard baud rates can be set with
+/// `BaudOther`, their behavior is system-dependent. Some systems may not support arbitrary baud
+/// rates. Using the standard baud rates is more likely to result in portable applications.
 #[derive(Debug,Copy,Clone,PartialEq,Eq)]
 pub enum BaudRate {
     /** 110 baud. */     Baud110,
@@ -209,15 +216,74 @@ pub enum BaudRate {
 
     /// Non-standard baud rates.
     ///
-    /// `BaudOther` can be used to set arbitrary baud rates by setting its member to be the desired
-    /// baud rate.
+    /// `BaudOther` can be used to set non-standard baud rates by setting its member to be the
+    /// desired baud rate.
     ///
     /// ```no_run
     /// serial::BaudOther(4_000_000); // 4,000,000 baud
     /// ```
     ///
-    /// Non-standard baud rates may not be supported by all hardware.
+    /// Non-standard baud rates may not be supported on all systems.
     BaudOther(usize)
+}
+
+impl BaudRate {
+    /// Creates a `BaudRate` for a particular speed.
+    ///
+    /// This function can be used to select a `BaudRate` variant from an integer containing the
+    /// desired baud rate.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # use serial::BaudRate;
+    /// assert_eq!(BaudRate::Baud9600, BaudRate::from_speed(9600));
+    /// assert_eq!(BaudRate::Baud115200, BaudRate::from_speed(115200));
+    /// assert_eq!(BaudRate::BaudOther(4000000), BaudRate::from_speed(4000000));
+    /// ```
+    pub fn from_speed(speed: usize) -> BaudRate {
+        match speed {
+            110    => BaudRate::Baud110,
+            300    => BaudRate::Baud300,
+            600    => BaudRate::Baud600,
+            1200   => BaudRate::Baud1200,
+            2400   => BaudRate::Baud2400,
+            4800   => BaudRate::Baud4800,
+            9600   => BaudRate::Baud9600,
+            19200  => BaudRate::Baud19200,
+            38400  => BaudRate::Baud38400,
+            57600  => BaudRate::Baud57600,
+            115200 => BaudRate::Baud115200,
+            n      => BaudRate::BaudOther(n),
+        }
+    }
+
+    /// Returns the baud rate as an integer.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # use serial::BaudRate;
+    /// assert_eq!(9600, BaudRate::Baud9600.speed());
+    /// assert_eq!(115200, BaudRate::Baud115200.speed());
+    /// assert_eq!(4000000, BaudRate::BaudOther(4000000).speed());
+    /// ```
+    pub fn speed(&self) -> usize {
+        match *self {
+            BaudRate::Baud110      => 110,
+            BaudRate::Baud300      => 300,
+            BaudRate::Baud600      => 600,
+            BaudRate::Baud1200     => 1200,
+            BaudRate::Baud2400     => 2400,
+            BaudRate::Baud4800     => 4800,
+            BaudRate::Baud9600     => 9600,
+            BaudRate::Baud19200    => 19200,
+            BaudRate::Baud38400    => 38400,
+            BaudRate::Baud57600    => 57600,
+            BaudRate::Baud115200   => 115200,
+            BaudRate::BaudOther(n) => n,
+        }
+    }
 }
 
 /// Number of bits per character.
