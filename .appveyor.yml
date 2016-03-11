@@ -4,10 +4,12 @@ platform:
 
 environment:
   matrix:
+    - RUST_VERSION: stable
+      VENDOR: gnu
+    - RUST_VERSION: stable
+      VENDOR: msvc
     - RUST_VERSION: 1.3.0
       VENDOR: gnu
-    - RUST_VERSION: 1.3.0
-      VENDOR: msvc
     - RUST_VERSION: beta
       VENDOR: gnu
     - RUST_VERSION: beta
@@ -21,7 +23,14 @@ install:
       else {
           $arch = "x86_64"
       }
-      Start-FileDownload "https://static.rust-lang.org/dist/rust-${env:RUST_VERSION}-$arch-pc-windows-${env:VENDOR}.exe" -FileName rust-install.exe
+      if ($env:RUST_VERSION -eq "stable") {
+        Start-FileDownload "https://static.rust-lang.org/dist/channel-rust-stable" -FileName "channel-rust-stable"
+        $installer = Get-Content "channel-rust-stable" | Select-String -Pattern "$arch-pc-windows-${env:VENDOR}.exe"
+      }
+      else {
+        $installer = "rust-${env:RUST_VERSION}-$arch-pc-windows-${env:VENDOR}.exe"
+      }
+      Start-FileDownload "https://static.rust-lang.org/dist/$installer" -FileName rust-install.exe
   - rust-install.exe /VERYSILENT /NORESTART /DIR="C:\Program Files (x86)\Rust"
   - SET PATH=%PATH%;C:\Program Files (x86)\Rust\bin
   - rustc -V
