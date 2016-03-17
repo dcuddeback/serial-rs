@@ -1,6 +1,8 @@
 language: rust
+os:
+  - linux
+  - osx
 rust:
   - 1.3.0
   - stable
   - beta
-  - nightly
