@@ -9,6 +9,7 @@
 
     <title>serial::SerialPortSettings - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
@@ -45,14 +46,14 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-612' class='srclink' href='../src/serial/lib.rs.html#626-685' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-649' class='srclink' href='../src/serial/lib.rs.html#692-751' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait SerialPortSettings {
     fn <a href='#tymethod.baud_rate' class='fnname'>baud_rate</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../serial/enum.BaudRate.html' title='serial::BaudRate'>BaudRate</a>&gt;;
     fn <a href='#tymethod.char_size' class='fnname'>char_size</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../serial/enum.CharSize.html' title='serial::CharSize'>CharSize</a>&gt;;
     fn <a href='#tymethod.parity' class='fnname'>parity</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../serial/enum.Parity.html' title='serial::Parity'>Parity</a>&gt;;
     fn <a href='#tymethod.stop_bits' class='fnname'>stop_bits</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../serial/enum.StopBits.html' title='serial::StopBits'>StopBits</a>&gt;;
     fn <a href='#tymethod.flow_control' class='fnname'>flow_control</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../serial/enum.FlowControl.html' title='serial::FlowControl'>FlowControl</a>&gt;;
-    fn <a href='#tymethod.set_baud_rate' class='fnname'>set_baud_rate</a>(&amp;mut self, baud_rate: <a class='enum' href='../serial/enum.BaudRate.html' title='serial::BaudRate'>BaudRate</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
+    fn <a href='#tymethod.set_baud_rate' class='fnname'>set_baud_rate</a>(&amp;mut self, baud_rate: <a class='enum' href='../serial/enum.BaudRate.html' title='serial::BaudRate'>BaudRate</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
     fn <a href='#tymethod.set_char_size' class='fnname'>set_char_size</a>(&amp;mut self, char_size: <a class='enum' href='../serial/enum.CharSize.html' title='serial::CharSize'>CharSize</a>);
     fn <a href='#tymethod.set_parity' class='fnname'>set_parity</a>(&amp;mut self, parity: <a class='enum' href='../serial/enum.Parity.html' title='serial::Parity'>Parity</a>);
     fn <a href='#tymethod.set_stop_bits' class='fnname'>set_stop_bits</a>(&amp;mut self, stop_bits: <a class='enum' href='../serial/enum.StopBits.html' title='serial::StopBits'>StopBits</a>);
@@ -89,7 +90,7 @@ stop bits to a supported value.</p>
 occur if the hardware is in an uninitialized state or is using an unsupported flow control
 mode. Setting a flow control mode with <code>set_flow_control()</code> should initialize the flow
 control mode to a supported value.</p>
-</div><h3 id='tymethod.set_baud_rate' class='method stab '><code>fn <a href='#tymethod.set_baud_rate' class='fnname'>set_baud_rate</a>(&amp;mut self, baud_rate: <a class='enum' href='../serial/enum.BaudRate.html' title='serial::BaudRate'>BaudRate</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the baud rate.</p>
+</div><h3 id='tymethod.set_baud_rate' class='method stab '><code>fn <a href='#tymethod.set_baud_rate' class='fnname'>set_baud_rate</a>(&amp;mut self, baud_rate: <a class='enum' href='../serial/enum.BaudRate.html' title='serial::BaudRate'>BaudRate</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the baud rate.</p>
 
 <h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
 <p>If the implementation does not support the requested baud rate, this function may return an
@@ -165,6 +166,6 @@ supported by the underlying hardware.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

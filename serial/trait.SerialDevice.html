@@ -9,6 +9,7 @@
 
     <title>serial::SerialDevice - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     
@@ -45,19 +46,19 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-523' class='srclink' href='../src/serial/lib.rs.html#299-425' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-560' class='srclink' href='../src/serial/lib.rs.html#365-491' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait SerialDevice: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> {
     type Settings: <a class='trait' href='../serial/trait.SerialPortSettings.html' title='serial::SerialPortSettings'>SerialPortSettings</a>;
     fn <a href='#tymethod.read_settings' class='fnname'>read_settings</a>(&amp;self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>&gt;;
-    fn <a href='#tymethod.write_settings' class='fnname'>write_settings</a>(&amp;mut self, settings: &amp;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
+    fn <a href='#tymethod.write_settings' class='fnname'>write_settings</a>(&amp;mut self, settings: &amp;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
     fn <a href='#tymethod.timeout' class='fnname'>timeout</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>;
-    fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
-    fn <a href='#tymethod.set_rts' class='fnname'>set_rts</a>(&amp;mut self, level: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
-    fn <a href='#tymethod.set_dtr' class='fnname'>set_dtr</a>(&amp;mut self, level: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
-    fn <a href='#tymethod.read_cts' class='fnname'>read_cts</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
-    fn <a href='#tymethod.read_dsr' class='fnname'>read_dsr</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
-    fn <a href='#tymethod.read_ri' class='fnname'>read_ri</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
-    fn <a href='#tymethod.read_cd' class='fnname'>read_cd</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
+    fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
+    fn <a href='#tymethod.set_rts' class='fnname'>set_rts</a>(&amp;mut self, level: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
+    fn <a href='#tymethod.set_dtr' class='fnname'>set_dtr</a>(&amp;mut self, level: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
+    fn <a href='#tymethod.read_cts' class='fnname'>read_cts</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
+    fn <a href='#tymethod.read_dsr' class='fnname'>read_dsr</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
+    fn <a href='#tymethod.read_ri' class='fnname'>read_ri</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
+    fn <a href='#tymethod.read_cd' class='fnname'>read_cd</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;;
 }</pre><div class='docblock'><p>A trait for implementing serial devices.</p>
 
 <p>This trait is meant to be used to implement new serial port devices. To use a serial port
@@ -105,7 +106,7 @@ hardware:</p>
 <li><code>NoDevice</code> if the device was disconnected.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.write_settings' class='method stab '><code>fn <a href='#tymethod.write_settings' class='fnname'>write_settings</a>(&amp;mut self, settings: &amp;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Applies new settings to the serial device.</p>
+</div><h3 id='tymethod.write_settings' class='method stab '><code>fn <a href='#tymethod.write_settings' class='fnname'>write_settings</a>(&amp;mut self, settings: &amp;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Applies new settings to the serial device.</p>
 
 <p>This function attempts to apply all settings to the serial device. Some settings may not be
 supported by the underlying hardware, in which case the result is dependent on the
@@ -114,7 +115,7 @@ appliied successfully. To check which settings were applied by a successful writ
 applications should use the <code>read_settings()</code> method to obtain the latest configuration
 state from the device.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-1' class='section-header'><a href='#errors-1'>Errors</a></h2>
 <p>This function returns an error if the settings could not be applied to the underlying
 hardware:</p>
 
@@ -124,12 +125,12 @@ hardware:</p>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
 </div><h3 id='tymethod.timeout' class='method stab '><code>fn <a href='#tymethod.timeout' class='fnname'>timeout</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a></code></h3><div class='docblock'><p>Returns the current timeout.</p>
-</div><h3 id='tymethod.set_timeout' class='method stab '><code>fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the timeout for future I/O operations.</p>
-</div><h3 id='tymethod.set_rts' class='method stab '><code>fn <a href='#tymethod.set_rts' class='fnname'>set_rts</a>(&amp;mut self, level: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the state of the RTS (Request To Send) control signal.</p>
+</div><h3 id='tymethod.set_timeout' class='method stab '><code>fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the timeout for future I/O operations.</p>
+</div><h3 id='tymethod.set_rts' class='method stab '><code>fn <a href='#tymethod.set_rts' class='fnname'>set_rts</a>(&amp;mut self, level: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the state of the RTS (Request To Send) control signal.</p>
 
 <p>Setting a value of <code>true</code> asserts the RTS control signal. <code>false</code> clears the signal.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-2' class='section-header'><a href='#errors-2'>Errors</a></h2>
 <p>This function returns an error if the RTS control signal could not be set to the desired
 state on the underlying hardware:</p>
 
@@ -137,11 +138,11 @@ state on the underlying hardware:</p>
 <li><code>NoDevice</code> if the device was disconnected.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.set_dtr' class='method stab '><code>fn <a href='#tymethod.set_dtr' class='fnname'>set_dtr</a>(&amp;mut self, level: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the state of the DTR (Data Terminal Ready) control signal.</p>
+</div><h3 id='tymethod.set_dtr' class='method stab '><code>fn <a href='#tymethod.set_dtr' class='fnname'>set_dtr</a>(&amp;mut self, level: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></h3><div class='docblock'><p>Sets the state of the DTR (Data Terminal Ready) control signal.</p>
 
 <p>Setting a value of <code>true</code> asserts the DTR control signal. <code>false</code> clears the signal.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-3' class='section-header'><a href='#errors-3'>Errors</a></h2>
 <p>This function returns an error if the DTR control signal could not be set to the desired
 state on the underlying hardware:</p>
 
@@ -149,11 +150,11 @@ state on the underlying hardware:</p>
 <li><code>NoDevice</code> if the device was disconnected.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.read_cts' class='method stab '><code>fn <a href='#tymethod.read_cts' class='fnname'>read_cts</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the CTS (Clear To Send) control signal.</p>
+</div><h3 id='tymethod.read_cts' class='method stab '><code>fn <a href='#tymethod.read_cts' class='fnname'>read_cts</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the CTS (Clear To Send) control signal.</p>
 
 <p>This function returns a boolean that indicates whether the CTS control signal is asserted.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-4' class='section-header'><a href='#errors-4'>Errors</a></h2>
 <p>This function returns an error if the state of the CTS control signal could not be read
 from the underlying hardware:</p>
 
@@ -161,11 +162,11 @@ from the underlying hardware:</p>
 <li><code>NoDevice</code> if the device was disconnected.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.read_dsr' class='method stab '><code>fn <a href='#tymethod.read_dsr' class='fnname'>read_dsr</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the DSR (Data Set Ready) control signal.</p>
+</div><h3 id='tymethod.read_dsr' class='method stab '><code>fn <a href='#tymethod.read_dsr' class='fnname'>read_dsr</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the DSR (Data Set Ready) control signal.</p>
 
 <p>This function returns a boolean that indicates whether the DSR control signal is asserted.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-5' class='section-header'><a href='#errors-5'>Errors</a></h2>
 <p>This function returns an error if the state of the DSR control signal could not be read
 from the underlying hardware:</p>
 
@@ -173,11 +174,11 @@ from the underlying hardware:</p>
 <li><code>NoDevice</code> if the device was disconnected.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.read_ri' class='method stab '><code>fn <a href='#tymethod.read_ri' class='fnname'>read_ri</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the RI (Ring Indicator) control signal.</p>
+</div><h3 id='tymethod.read_ri' class='method stab '><code>fn <a href='#tymethod.read_ri' class='fnname'>read_ri</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the RI (Ring Indicator) control signal.</p>
 
 <p>This function returns a boolean that indicates whether the RI control signal is asserted.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-6' class='section-header'><a href='#errors-6'>Errors</a></h2>
 <p>This function returns an error if the state of the RI control signal could not be read from
 the underlying hardware:</p>
 
@@ -185,11 +186,11 @@ the underlying hardware:</p>
 <li><code>NoDevice</code> if the device was disconnected.</li>
 <li><code>Io</code> for any other type of I/O error.</li>
 </ul>
-</div><h3 id='tymethod.read_cd' class='method stab '><code>fn <a href='#tymethod.read_cd' class='fnname'>read_cd</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the CD (Carrier Detect) control signal.</p>
+</div><h3 id='tymethod.read_cd' class='method stab '><code>fn <a href='#tymethod.read_cd' class='fnname'>read_cd</a>(&amp;mut self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code></h3><div class='docblock'><p>Reads the state of the CD (Carrier Detect) control signal.</p>
 
 <p>This function returns a boolean that indicates whether the CD control signal is asserted.</p>
 
-<h2 id='errors' class='section-header'><a href='#errors'>Errors</a></h2>
+<h2 id='errors-7' class='section-header'><a href='#errors-7'>Errors</a></h2>
 <p>This function returns an error if the state of the CD control signal could not be read from
 the underlying hardware:</p>
 
@@ -262,6 +263,6 @@ the underlying hardware:</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>
