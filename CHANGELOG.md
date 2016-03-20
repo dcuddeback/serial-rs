@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.3.3 (2016-03-20)
+### Added
+* Added support for OpenBSD.
+* ([#10](https://github.com/dcuddeback/serial-rs/issues/10))
+  Added support for OS-specific baud rates for termios-based serial ports.
+* ([#10](https://github.com/dcuddeback/serial-rs/issues/10))
+  Added `BaudRate::from_speed()` constructor.
+
 ## 0.3.2 (2015-11-05)
 ### Changed
 * Upgraded `libc` dependency to v0.2.

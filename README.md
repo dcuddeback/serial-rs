@@ -14,6 +14,7 @@ termios API. The following platforms are confirmed to be compatible:
 * Linux (x86_64, armv6l)
 * OS X (x86_64)
 * FreeBSD (amd64)
+* OpenBSD (amd64)
 * Windows (x86_64)
 
 Compiling the `serial` crate requires Rust 1.3 or later.
