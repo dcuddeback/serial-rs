@@ -1,4 +1,6 @@
 extern crate libc;
+#[cfg(target_os = "linux")]
+extern crate libudev;
 extern crate termios;
 extern crate ioctl_rs as ioctl;
 
@@ -11,7 +13,7 @@ use std::os::unix::prelude::*;
 
 use self::libc::{c_int,c_void,size_t};
 
-use ::{SerialDevice,SerialPortSettings};
+use ::{SerialDevice,SerialPortSettings,PortInfo};
 
 
 #[cfg(target_os = "linux")]
@@ -643,4 +645,24 @@ mod tests {
         settings.set_flow_control(::FlowNone);
         assert_eq!(settings.flow_control(), Some(::FlowNone));
     }
+}
+
+#[cfg(target_os = "linux")]
+pub fn list_ports() -> ::Result<Vec<PortInfo>> {
+    let mut vec = Vec::new();
+    if let Ok(context) = libudev::Context::new() {
+        let mut enumerator = try!(libudev::Enumerator::new(&context));
+        try!(enumerator.match_subsystem("tty"));
+        let devices = try!(enumerator.scan_devices());
+        for d in devices {
+            if d.parent().is_some() {
+                if let Some(devnode) = d.devnode() {
+                    if let Some(path) = devnode.to_str() {
+                        vec.push(PortInfo { port_name: String::from(path) });
+                    }
+                }
+            }
+        }
+    }
+    Ok(vec)
 }
