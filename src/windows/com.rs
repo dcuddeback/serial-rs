@@ -11,7 +11,7 @@ use std::os::windows::prelude::*;
 use self::libc::c_void;
 
 use super::ffi::*;
-use ::{SerialDevice,SerialPortSettings};
+use ::core::{SerialDevice,SerialPortSettings};
 
 
 /// A serial port implementation for Windows COM ports.
@@ -39,7 +39,7 @@ impl COMPort {
     ///   already in use.
     /// * `InvalidInput` if `port` is not a valid device name.
     /// * `Io` for any other I/O error while opening or initializing the device.
-    pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<Self> {
+    pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::core::Result<Self> {
         let mut name = Vec::<u16>::new();
 
         name.extend(OsStr::new("\\\\.\\").encode_wide());
@@ -66,14 +66,14 @@ impl COMPort {
         }
     }
 
-    fn escape_comm_function(&mut self, function: DWORD) -> ::Result<()> {
+    fn escape_comm_function(&mut self, function: DWORD) -> ::core::Result<()> {
         match unsafe { EscapeCommFunction(self.handle, function) } {
             0 => Err(super::error::last_os_error()),
             _ => Ok(())
         }
     }
 
-    fn read_pin(&mut self, pin: DWORD) -> ::Result<bool> {
+    fn read_pin(&mut self, pin: DWORD) -> ::core::Result<bool> {
         let mut status: DWORD = unsafe { mem::uninitialized() };
 
         match unsafe { GetCommModemStatus(self.handle, &mut status) } {
@@ -138,7 +138,7 @@ impl io::Write for COMPort {
 impl SerialDevice for COMPort {
     type Settings = COMSettings;
 
-    fn read_settings(&self) -> ::Result<COMSettings> {
+    fn read_settings(&self) -> ::core::Result<COMSettings> {
         let mut dcb = DCB::new();
 
         match unsafe { GetCommState(self.handle, &mut dcb) } {
@@ -148,7 +148,7 @@ impl SerialDevice for COMPort {
         }
     }
 
-    fn write_settings(&mut self, settings: &COMSettings) -> ::Result<()> {
+    fn write_settings(&mut self, settings: &COMSettings) -> ::core::Result<()> {
         match unsafe { SetCommState(self.handle, &settings.inner) } {
             0 => Err(super::error::last_os_error()),
             _ => Ok(())
@@ -159,7 +159,7 @@ impl SerialDevice for COMPort {
         self.timeout
     }
 
-    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()> {
+    fn set_timeout(&mut self, timeout: Duration) -> ::core::Result<()> {
         let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
 
         let timeouts = COMMTIMEOUTS {
@@ -178,7 +178,7 @@ impl SerialDevice for COMPort {
         Ok(())
     }
 
-    fn set_rts(&mut self, level: bool) -> ::Result<()> {
+    fn set_rts(&mut self, level: bool) -> ::core::Result<()> {
         if level {
             self.escape_comm_function(SETRTS)
         }
@@ -187,7 +187,7 @@ impl SerialDevice for COMPort {
         }
     }
 
-    fn set_dtr(&mut self, level: bool) -> ::Result<()> {
+    fn set_dtr(&mut self, level: bool) -> ::core::Result<()> {
         if level {
             self.escape_comm_function(SETDTR)
         }
@@ -196,19 +196,19 @@ impl SerialDevice for COMPort {
         }
     }
 
-    fn read_cts(&mut self) -> ::Result<bool> {
+    fn read_cts(&mut self) -> ::core::Result<bool> {
         self.read_pin(MS_CTS_ON)
     }
 
-    fn read_dsr(&mut self) -> ::Result<bool> {
+    fn read_dsr(&mut self) -> ::core::Result<bool> {
         self.read_pin(MS_DSR_ON)
     }
 
-    fn read_ri(&mut self) -> ::Result<bool> {
+    fn read_ri(&mut self) -> ::core::Result<bool> {
         self.read_pin(MS_RING_ON)
     }
 
-    fn read_cd(&mut self) -> ::Result<bool> {
+    fn read_cd(&mut self) -> ::core::Result<bool> {
         self.read_pin(MS_RLSD_ON)
     }
 }
@@ -221,120 +221,120 @@ pub struct COMSettings {
 }
 
 impl SerialPortSettings for COMSettings {
-    fn baud_rate(&self) -> Option<::BaudRate> {
+    fn baud_rate(&self) -> Option<::core::BaudRate> {
         match self.inner.BaudRate {
-            CBR_110    => Some(::Baud110),
-            CBR_300    => Some(::Baud300),
-            CBR_600    => Some(::Baud600),
-            CBR_1200   => Some(::Baud1200),
-            CBR_2400   => Some(::Baud2400),
-            CBR_4800   => Some(::Baud4800),
-            CBR_9600   => Some(::Baud9600),
-            CBR_14400  => Some(::BaudOther(14400)),
-            CBR_19200  => Some(::Baud19200),
-            CBR_38400  => Some(::Baud38400),
-            CBR_56000  => Some(::BaudOther(56000)),
-            CBR_57600  => Some(::Baud57600),
-            CBR_115200 => Some(::Baud115200),
-            CBR_128000 => Some(::BaudOther(128000)),
-            CBR_256000 => Some(::BaudOther(256000)),
-            n          => Some(::BaudOther(n as usize))
+            CBR_110    => Some(::core::Baud110),
+            CBR_300    => Some(::core::Baud300),
+            CBR_600    => Some(::core::Baud600),
+            CBR_1200   => Some(::core::Baud1200),
+            CBR_2400   => Some(::core::Baud2400),
+            CBR_4800   => Some(::core::Baud4800),
+            CBR_9600   => Some(::core::Baud9600),
+            CBR_14400  => Some(::core::BaudOther(14400)),
+            CBR_19200  => Some(::core::Baud19200),
+            CBR_38400  => Some(::core::Baud38400),
+            CBR_56000  => Some(::core::BaudOther(56000)),
+            CBR_57600  => Some(::core::Baud57600),
+            CBR_115200 => Some(::core::Baud115200),
+            CBR_128000 => Some(::core::BaudOther(128000)),
+            CBR_256000 => Some(::core::BaudOther(256000)),
+            n          => Some(::core::BaudOther(n as usize))
         }
     }
 
-    fn char_size(&self) -> Option<::CharSize> {
+    fn char_size(&self) -> Option<::core::CharSize> {
         match self.inner.ByteSize {
-            5 => Some(::Bits5),
-            6 => Some(::Bits6),
-            7 => Some(::Bits7),
-            8 => Some(::Bits8),
+            5 => Some(::core::Bits5),
+            6 => Some(::core::Bits6),
+            7 => Some(::core::Bits7),
+            8 => Some(::core::Bits8),
             _ => None
         }
     }
 
-    fn parity(&self) -> Option<::Parity> {
+    fn parity(&self) -> Option<::core::Parity> {
         match self.inner.Parity {
-            ODDPARITY  => Some(::ParityOdd),
-            EVENPARITY => Some(::ParityEven),
-            NOPARITY   => Some(::ParityNone),
+            ODDPARITY  => Some(::core::ParityOdd),
+            EVENPARITY => Some(::core::ParityEven),
+            NOPARITY   => Some(::core::ParityNone),
             _          => None
         }
     }
 
-    fn stop_bits(&self) -> Option<::StopBits> {
+    fn stop_bits(&self) -> Option<::core::StopBits> {
         match self.inner.StopBits {
-            TWOSTOPBITS => Some(::Stop2),
-            ONESTOPBIT  => Some(::Stop1),
+            TWOSTOPBITS => Some(::core::Stop2),
+            ONESTOPBIT  => Some(::core::Stop1),
             _           => None
         }
     }
 
-    fn flow_control(&self) -> Option<::FlowControl> {
+    fn flow_control(&self) -> Option<::core::FlowControl> {
         if self.inner.fBits & (fOutxCtsFlow | fRtsControl) != 0 {
-            Some(::FlowHardware)
+            Some(::core::FlowHardware)
         }
         else if self.inner.fBits & (fOutX | fInX) != 0 {
-            Some(::FlowSoftware)
+            Some(::core::FlowSoftware)
         }
         else {
-            Some(::FlowNone)
+            Some(::core::FlowNone)
         }
     }
 
-    fn set_baud_rate(&mut self, baud_rate: ::BaudRate) -> ::Result<()> {
+    fn set_baud_rate(&mut self, baud_rate: ::core::BaudRate) -> ::core::Result<()> {
         self.inner.BaudRate = match baud_rate {
-            ::Baud110      => CBR_110,
-            ::Baud300      => CBR_300,
-            ::Baud600      => CBR_600,
-            ::Baud1200     => CBR_1200,
-            ::Baud2400     => CBR_2400,
-            ::Baud4800     => CBR_4800,
-            ::Baud9600     => CBR_9600,
-            ::Baud19200    => CBR_19200,
-            ::Baud38400    => CBR_38400,
-            ::Baud57600    => CBR_57600,
-            ::Baud115200   => CBR_115200,
-            ::BaudOther(n) => n as DWORD
+            ::core::Baud110      => CBR_110,
+            ::core::Baud300      => CBR_300,
+            ::core::Baud600      => CBR_600,
+            ::core::Baud1200     => CBR_1200,
+            ::core::Baud2400     => CBR_2400,
+            ::core::Baud4800     => CBR_4800,
+            ::core::Baud9600     => CBR_9600,
+            ::core::Baud19200    => CBR_19200,
+            ::core::Baud38400    => CBR_38400,
+            ::core::Baud57600    => CBR_57600,
+            ::core::Baud115200   => CBR_115200,
+            ::core::BaudOther(n) => n as DWORD
         };
 
         Ok(())
     }
 
-    fn set_char_size(&mut self, char_size: ::CharSize) {
+    fn set_char_size(&mut self, char_size: ::core::CharSize) {
         self.inner.ByteSize = match char_size {
-            ::Bits5 => 5,
-            ::Bits6 => 6,
-            ::Bits7 => 7,
-            ::Bits8 => 8
+            ::core::Bits5 => 5,
+            ::core::Bits6 => 6,
+            ::core::Bits7 => 7,
+            ::core::Bits8 => 8
         }
     }
 
-    fn set_parity(&mut self, parity: ::Parity) {
+    fn set_parity(&mut self, parity: ::core::Parity) {
         self.inner.Parity = match parity {
-            ::ParityNone => NOPARITY,
-            ::ParityOdd  => ODDPARITY,
-            ::ParityEven => EVENPARITY
+            ::core::ParityNone => NOPARITY,
+            ::core::ParityOdd  => ODDPARITY,
+            ::core::ParityEven => EVENPARITY
         }
     }
 
-    fn set_stop_bits(&mut self, stop_bits: ::StopBits) {
+    fn set_stop_bits(&mut self, stop_bits: ::core::StopBits) {
         self.inner.StopBits = match stop_bits {
-            ::Stop1 => ONESTOPBIT,
-            ::Stop2 => TWOSTOPBITS
+            ::core::Stop1 => ONESTOPBIT,
+            ::core::Stop2 => TWOSTOPBITS
         }
     }
 
-    fn set_flow_control(&mut self, flow_control: ::FlowControl) {
+    fn set_flow_control(&mut self, flow_control: ::core::FlowControl) {
         match flow_control {
-            ::FlowNone => {
+            ::core::FlowNone => {
                 self.inner.fBits &= !(fOutxCtsFlow | fRtsControl);
                 self.inner.fBits &= !(fOutX | fInX);
             },
-            ::FlowSoftware => {
+            ::core::FlowSoftware => {
                 self.inner.fBits &= !(fOutxCtsFlow | fRtsControl);
                 self.inner.fBits |= fOutX | fInX;
             },
-            ::FlowHardware => {
+            ::core::FlowHardware => {
                 self.inner.fBits |= fOutxCtsFlow | fRtsControl;
                 self.inner.fBits &= !(fOutX | fInX);
             }

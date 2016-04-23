@@ -9,15 +9,15 @@ const ERROR_FILE_NOT_FOUND: c_int = 2;
 const ERROR_PATH_NOT_FOUND: c_int = 3;
 const ERROR_ACCESS_DENIED: c_int = 5;
 
-pub fn last_os_error() -> ::Error {
+pub fn last_os_error() -> ::core::Error {
     let errno = errno();
 
     let kind = match errno {
-        ERROR_FILE_NOT_FOUND | ERROR_PATH_NOT_FOUND | ERROR_ACCESS_DENIED => ::ErrorKind::NoDevice,
-        _ => ::ErrorKind::Io(io::ErrorKind::Other)
+        ERROR_FILE_NOT_FOUND | ERROR_PATH_NOT_FOUND | ERROR_ACCESS_DENIED => ::core::ErrorKind::NoDevice,
+        _ => ::core::ErrorKind::Io(io::ErrorKind::Other)
     };
 
-    ::Error::new(kind, error_string(errno).trim())
+    ::core::Error::new(kind, error_string(errno).trim())
 }
 
 // the rest of this module is borrowed from libstd

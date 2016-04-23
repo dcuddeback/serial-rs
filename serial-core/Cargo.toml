@@ -1,0 +1,7 @@
+[package]
+name = "serial-core"
+version = "0.4.0"
+authors = ["David Cuddeback <david.cuddeback@gmail.com>"]
+
+[dependencies]
+libc = "0.2"

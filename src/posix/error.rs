@@ -7,32 +7,32 @@ use std::str;
 
 use self::libc::{c_int,c_char,size_t};
 
-pub fn last_os_error() -> ::Error {
+pub fn last_os_error() -> ::core::Error {
     from_raw_os_error(errno())
 }
 
-pub fn from_raw_os_error(errno: i32) -> ::Error {
+pub fn from_raw_os_error(errno: i32) -> ::core::Error {
     use self::libc::{EBUSY,EISDIR,ELOOP,ENOTDIR,ENOENT,ENODEV,ENXIO,EACCES,EINVAL,ENAMETOOLONG,EINTR,EWOULDBLOCK};
 
     let kind = match errno {
-        EBUSY | EISDIR | ELOOP | ENOTDIR | ENOENT | ENODEV | ENXIO | EACCES => ::ErrorKind::NoDevice,
-        EINVAL | ENAMETOOLONG => ::ErrorKind::InvalidInput,
+        EBUSY | EISDIR | ELOOP | ENOTDIR | ENOENT | ENODEV | ENXIO | EACCES => ::core::ErrorKind::NoDevice,
+        EINVAL | ENAMETOOLONG => ::core::ErrorKind::InvalidInput,
 
-        EINTR => ::ErrorKind::Io(io::ErrorKind::Interrupted),
-        EWOULDBLOCK => ::ErrorKind::Io(io::ErrorKind::WouldBlock),
-        _ => ::ErrorKind::Io(io::ErrorKind::Other)
+        EINTR => ::core::ErrorKind::Io(io::ErrorKind::Interrupted),
+        EWOULDBLOCK => ::core::ErrorKind::Io(io::ErrorKind::WouldBlock),
+        _ => ::core::ErrorKind::Io(io::ErrorKind::Other)
     };
 
-    ::Error::new(kind, error_string(errno))
+    ::core::Error::new(kind, error_string(errno))
 }
 
-pub fn from_io_error(io_error: io::Error) -> ::Error {
+pub fn from_io_error(io_error: io::Error) -> ::core::Error {
     match io_error.raw_os_error() {
         Some(errno) => from_raw_os_error(errno),
         None => {
             let description = io_error.description().to_string();
 
-            ::Error::new(::ErrorKind::Io(io_error.kind()), description)
+            ::core::Error::new(::core::ErrorKind::Io(io_error.kind()), description)
         }
     }
 }

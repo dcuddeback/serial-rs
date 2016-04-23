@@ -12,6 +12,7 @@ keywords = ["serial", "hardware", "system", "RS232"]
 
 [dependencies]
 libc = "0.2.1"
+serial-core = { path = "./serial-core" }
 
 [target.aarch64-unknown-linux-gnu.dependencies]
 termios = "0.2.2"
