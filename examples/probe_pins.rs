@@ -34,7 +34,7 @@ fn probe_pins<T: SerialPort>(port: &mut T) -> serial::Result<()> {
     let mut toggle = true;
 
     loop {
-        thread::sleep_ms(1000);
+        thread::sleep(Duration::from_secs(1));
 
         if toggle {
             rts = !rts;
