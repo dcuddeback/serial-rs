@@ -1,10 +1,8 @@
 #![allow(non_snake_case,non_camel_case_types,non_upper_case_globals,dead_code)]
 
-extern crate libc;
-
 use std::mem;
 
-use self::libc::{c_void,c_char,c_int,c_ulong,wchar_t};
+use libc::{c_void, c_char, c_int, c_ulong, wchar_t};
 
 pub type BYTE = u8;
 pub type WORD = u16;
@@ -49,21 +47,21 @@ pub type LPOVERLAPPED = *mut OVERLAPPED;
 #[derive(Copy,Clone,Debug)]
 #[repr(C)]
 pub struct DCB {
-    pub DCBlength:  DWORD,
-    pub BaudRate:   DWORD,
-    pub fBits:      DWORD,
-    pub wReserved:  WORD,
-    pub XonLim:     WORD,
-    pub XoffLim:    WORD,
-    pub ByteSize:   BYTE,
-    pub Parity:     BYTE,
-    pub StopBits:   BYTE,
-    pub XonChar:    c_char,
-    pub XoffChar:   c_char,
-    pub ErrorChar:  c_char,
-    pub EofChar:    c_char,
-    pub EvtChar:    c_char,
-    pub wReserved1: WORD
+    pub DCBlength: DWORD,
+    pub BaudRate: DWORD,
+    pub fBits: DWORD,
+    pub wReserved: WORD,
+    pub XonLim: WORD,
+    pub XoffLim: WORD,
+    pub ByteSize: BYTE,
+    pub Parity: BYTE,
+    pub StopBits: BYTE,
+    pub XonChar: c_char,
+    pub XoffChar: c_char,
+    pub ErrorChar: c_char,
+    pub EofChar: c_char,
+    pub EvtChar: c_char,
+    pub wReserved1: WORD,
 }
 
 // BaudRate values
@@ -142,7 +140,7 @@ pub struct COMMTIMEOUTS {
     pub ReadTotalTimeoutMultiplier: DWORD,
     pub ReadTotalTimeoutConstant: DWORD,
     pub WriteTotalTimeoutMultiplier: DWORD,
-    pub WriteTotalTimeoutConstant: DWORD
+    pub WriteTotalTimeoutConstant: DWORD,
 }
 
 extern "system" {
@@ -152,18 +150,21 @@ extern "system" {
                        lpSecurityAttributes: LPSECURITY_ATTRIBUTES,
                        dwCreationDisposition: DWORD,
                        dwFlagsAndAttributes: DWORD,
-                       hTemplmateFile: HANDLE) -> HANDLE;
+                       hTemplmateFile: HANDLE)
+                       -> HANDLE;
     pub fn CloseHandle(hObject: HANDLE) -> BOOL;
     pub fn ReadFile(hFile: HANDLE,
                     lpBuffer: LPVOID,
                     nNumberOfBytesToRead: DWORD,
                     lpNumberOfBytesRead: LPDWORD,
-                    lpOverlapped: LPOVERLAPPED) -> BOOL;
+                    lpOverlapped: LPOVERLAPPED)
+                    -> BOOL;
     pub fn WriteFile(hFile: HANDLE,
                      lpBuffer: LPVOID,
                      nNumberOfBytesToWrite: DWORD,
                      lpNumberOfBytesWritten: LPDWORD,
-                     lpOverlapped: LPOVERLAPPED) -> BOOL;
+                     lpOverlapped: LPOVERLAPPED)
+                     -> BOOL;
     pub fn FlushFileBuffers(hFile: HANDLE) -> BOOL;
 
     pub fn GetCommState(hFile: HANDLE, lpDCB: *mut DCB) -> BOOL;

@@ -3,6 +3,9 @@ pub extern crate serial_core as core;
 #[cfg(unix)]
 pub extern crate serial_unix as unix;
 
+#[cfg(windows)]
+pub extern crate serial_windows as windows;
+
 use std::ffi::OsStr;
 
 #[doc(no_inline)] pub use core::prelude;
@@ -16,9 +19,6 @@ pub use core::CharSize::*;
 pub use core::Parity::*;
 pub use core::StopBits::*;
 pub use core::FlowControl::*;
-
-#[cfg(windows)]
-pub mod windows;
 
 /// A convenience type alias for the system's native serial port type.
 #[cfg(unix)]
