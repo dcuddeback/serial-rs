@@ -1,11 +1,11 @@
 #![allow(non_camel_case_types,dead_code)]
 
-extern crate libc;
+use libc;
 
 use std::io;
 use std::time::Duration;
 
-use self::libc::{c_int,c_short};
+use libc::{c_int, c_short};
 
 #[cfg(target_os = "linux")]
 type nfds_t = libc::c_ulong;
@@ -15,10 +15,10 @@ type nfds_t = libc::c_uint;
 
 #[derive(Debug)]
 #[repr(C)]
-struct PollFd {
+struct pollfd {
     fd: c_int,
     events: c_short,
-    revents: c_short
+    revents: c_short,
 }
 
 const POLLIN:   c_short = 0x0001;
@@ -38,9 +38,9 @@ pub fn wait_write_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
 }
 
 fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
-    use self::libc::{EINTR,EPIPE,EIO};
+    use libc::{EINTR, EPIPE, EIO};
 
-    let mut fds = vec!(PollFd { fd: fd, events: events, revents: 0 });
+    let mut fds = vec!(pollfd { fd: fd, events: events, revents: 0 });
 
     let wait = do_poll(&mut fds, timeout);
 
@@ -49,7 +49,7 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
 
         let kind = match errno {
             EINTR => io::ErrorKind::Interrupted,
-            _ => io::ErrorKind::Other
+            _ => io::ErrorKind::Other,
         };
 
         return Err(io::Error::new(kind, super::error::error_string(errno)));
@@ -72,21 +72,21 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
 
 #[cfg(target_os = "linux")]
 #[inline]
-fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
+fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
     use std::ptr;
 
-    use self::libc::{c_void};
+    use libc::c_void;
 
     #[repr(C)]
     struct sigset_t {
-        __private: c_void
+        __private: c_void,
     }
 
     extern "C" {
-        fn ppoll(fds: *mut PollFd, nfds: nfds_t, timeout_ts: *mut self::libc::timespec, sigmask: *const sigset_t) -> c_int;
+        fn ppoll(fds: *mut pollfd, nfds: nfds_t, timeout_ts: *mut libc::timespec, sigmask: *const sigset_t) -> c_int;
     }
 
-    let mut timeout_ts = self::libc::timespec {
+    let mut timeout_ts = libc::timespec {
         tv_sec: timeout.as_secs() as libc::time_t,
         tv_nsec: timeout.subsec_nanos() as libc::c_long,
     };
@@ -101,9 +101,9 @@ fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
 
 #[cfg(not(target_os = "linux"))]
 #[inline]
-fn do_poll(fds: &mut Vec<PollFd>, timeout: Duration) -> c_int {
+fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
     extern "C" {
-        fn poll(fds: *mut PollFd, nfds: nfds_t, timeout: c_int) -> c_int;
+        fn poll(fds: *mut pollfd, nfds: nfds_t, timeout: c_int) -> c_int;
     }
 
     let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;

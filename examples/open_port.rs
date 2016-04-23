@@ -6,7 +6,7 @@ fn main() {
 
     serial::open("/dev/ttyUSB0").unwrap();
     serial::open(Path::new("/dev/ttyUSB0")).unwrap();
-    serial::posix::TTYPort::open(Path::new("/dev/ttyUSB0")).unwrap();
+    serial::unix::TTYPort::open(Path::new("/dev/ttyUSB0")).unwrap();
 }
 
 #[cfg(windows)]

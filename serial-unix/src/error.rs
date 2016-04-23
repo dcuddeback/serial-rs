@@ -1,38 +1,38 @@
-extern crate libc;
+use core;
 
 use std::error::Error;
 use std::ffi::CStr;
 use std::io;
 use std::str;
 
-use self::libc::{c_int,c_char,size_t};
+use libc::{c_int, c_char, size_t};
 
-pub fn last_os_error() -> ::core::Error {
+pub fn last_os_error() -> core::Error {
     from_raw_os_error(errno())
 }
 
-pub fn from_raw_os_error(errno: i32) -> ::core::Error {
-    use self::libc::{EBUSY,EISDIR,ELOOP,ENOTDIR,ENOENT,ENODEV,ENXIO,EACCES,EINVAL,ENAMETOOLONG,EINTR,EWOULDBLOCK};
+pub fn from_raw_os_error(errno: i32) -> core::Error {
+    use libc::{EBUSY, EISDIR, ELOOP, ENOTDIR, ENOENT, ENODEV, ENXIO, EACCES, EINVAL, ENAMETOOLONG, EINTR, EWOULDBLOCK};
 
     let kind = match errno {
-        EBUSY | EISDIR | ELOOP | ENOTDIR | ENOENT | ENODEV | ENXIO | EACCES => ::core::ErrorKind::NoDevice,
-        EINVAL | ENAMETOOLONG => ::core::ErrorKind::InvalidInput,
+        EBUSY | EISDIR | ELOOP | ENOTDIR | ENOENT | ENODEV | ENXIO | EACCES => core::ErrorKind::NoDevice,
+        EINVAL | ENAMETOOLONG => core::ErrorKind::InvalidInput,
 
-        EINTR => ::core::ErrorKind::Io(io::ErrorKind::Interrupted),
-        EWOULDBLOCK => ::core::ErrorKind::Io(io::ErrorKind::WouldBlock),
-        _ => ::core::ErrorKind::Io(io::ErrorKind::Other)
+        EINTR       => core::ErrorKind::Io(io::ErrorKind::Interrupted),
+        EWOULDBLOCK => core::ErrorKind::Io(io::ErrorKind::WouldBlock),
+        _           => core::ErrorKind::Io(io::ErrorKind::Other),
     };
 
-    ::core::Error::new(kind, error_string(errno))
+    core::Error::new(kind, error_string(errno))
 }
 
-pub fn from_io_error(io_error: io::Error) -> ::core::Error {
+pub fn from_io_error(io_error: io::Error) -> core::Error {
     match io_error.raw_os_error() {
         Some(errno) => from_raw_os_error(errno),
         None => {
             let description = io_error.description().to_string();
 
-            ::core::Error::new(::core::ErrorKind::Io(io_error.kind()), description)
+            core::Error::new(core::ErrorKind::Io(io_error.kind()), description)
         }
     }
 }
@@ -42,9 +42,7 @@ pub fn from_io_error(io_error: io::Error) -> ::core::Error {
 const TMPBUF_SZ: usize = 128;
 
 pub fn errno() -> i32 {
-    #[cfg(any(target_os = "macos",
-              target_os = "ios",
-              target_os = "freebsd"))]
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd"))]
     unsafe fn errno_location() -> *const c_int {
         extern { fn __error() -> *const c_int; }
         __error()
@@ -87,13 +85,11 @@ pub fn error_string(errno: i32) -> String {
     #[cfg(target_os = "linux")]
     extern {
         #[link_name = "__xpg_strerror_r"]
-        fn strerror_r(errnum: c_int, buf: *mut c_char,
-                      buflen: size_t) -> c_int;
+        fn strerror_r(errnum: c_int, buf: *mut c_char, buflen: size_t) -> c_int;
     }
     #[cfg(not(target_os = "linux"))]
     extern {
-        fn strerror_r(errnum: c_int, buf: *mut c_char,
-                      buflen: size_t) -> c_int;
+        fn strerror_r(errnum: c_int, buf: *mut c_char, buflen: size_t) -> c_int;
     }
 
     let mut buf = [0 as c_char; TMPBUF_SZ];

@@ -1,5 +1,8 @@
 pub extern crate serial_core as core;
 
+#[cfg(unix)]
+pub extern crate serial_unix as unix;
+
 use std::ffi::OsStr;
 
 #[doc(no_inline)] pub use core::prelude;
@@ -14,15 +17,12 @@ pub use core::Parity::*;
 pub use core::StopBits::*;
 pub use core::FlowControl::*;
 
-#[cfg(unix)]
-pub mod posix;
-
 #[cfg(windows)]
 pub mod windows;
 
 /// A convenience type alias for the system's native serial port type.
 #[cfg(unix)]
-pub type SystemPort = posix::TTYPort;
+pub type SystemPort = unix::TTYPort;
 
 /// A convenience type alias for the system's native serial port type.
 #[cfg(windows)]
@@ -64,7 +64,7 @@ pub type SystemPort = windows::COMPort;
 #[cfg(unix)]
 pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::core::Result<SystemPort> {
     use std::path::Path;
-    posix::TTYPort::open(Path::new(port))
+    unix::TTYPort::open(Path::new(port))
 }
 
 /// A convenience function for opening a native serial port.
