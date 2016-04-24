@@ -657,9 +657,14 @@ pub fn list_ports() -> ::Result<Vec<PortInfo>> {
         try!(enumerator.match_subsystem("tty"));
         let devices = try!(enumerator.scan_devices());
         for d in devices {
-            if d.parent().is_some() {
+            if let Some(p) = d.parent() {
                 if let Some(devnode) = d.devnode() {
                     if let Some(path) = devnode.to_str() {
+                        if let Some(driver) = p.driver() {
+                            if driver == "serial8250" && ::open(Path::new(devnode)).is_err() {
+                                continue;
+                            }
+                        }
                         vec.push(PortInfo { port_name: String::from(path) });
                     }
                 }
