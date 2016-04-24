@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.4.0 (2017-07-01)
+### Changed
+* Split implementation into multiple crates:
+  * [`serial-core`](serial-core) contains core abstractions.
+  * [`serial-unix`](serial-unix) provides Unix implementation.
+  * [`serial-windows`](serial-windows) provides Windows implementation.
+  * [`serial`](serial) provides cross-platform interface.
+* Renamed `serial::posix` module to `serial::unix`.
+
+### Removed
+* Removed implementation of `Default` for `PortSettings`.
+
+### Fixed
+* Fixed bugs in the Windows implementation that did not reset parity, binary, or DTR control
+  settings.
+
 ## 0.3.4 (2016-06-01)
 ### Fixed
 * ([#16](https://github.com/dcuddeback/serial-rs/issues/16))
