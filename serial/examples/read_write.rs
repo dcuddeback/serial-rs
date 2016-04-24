@@ -11,7 +11,7 @@ const SETTINGS: serial::PortSettings = serial::PortSettings {
     char_size:    serial::Bits8,
     parity:       serial::ParityNone,
     stop_bits:    serial::Stop1,
-    flow_control: serial::FlowNone
+    flow_control: serial::FlowNone,
 };
 
 fn main() {

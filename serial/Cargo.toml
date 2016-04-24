@@ -11,10 +11,10 @@ readme = "README.md"
 keywords = ["serial", "hardware", "system", "RS232"]
 
 [dependencies]
-serial-core = { path = "./serial-core" }
+serial-core = { path = "../serial-core" }
 
 [target.'cfg(unix)'.dependencies]
-serial-unix = { path = "./serial-unix" }
+serial-unix = { path = "../serial-unix" }
 
 [target.'cfg(windows)'.dependencies]
-serial-windows = { path = "./serial-windows" }
+serial-windows = { path = "../serial-windows" }
