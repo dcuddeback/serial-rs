@@ -1,4 +1,3 @@
-use std::default::Default;
 use std::error::Error as StdError;
 use std::fmt;
 use std::io;
@@ -709,18 +708,6 @@ pub struct PortSettings {
     pub flow_control: FlowControl,
 }
 
-impl Default for PortSettings {
-    fn default() -> Self {
-        PortSettings {
-            baud_rate: BaudRate::Baud9600,
-            char_size: CharSize::Bits8,
-            parity: Parity::ParityNone,
-            stop_bits: StopBits::Stop1,
-            flow_control: FlowControl::FlowNone,
-        }
-    }
-}
-
 impl SerialPortSettings for PortSettings {
     fn baud_rate(&self) -> Option<BaudRate> {
         Some(self.baud_rate)
@@ -766,40 +753,49 @@ impl SerialPortSettings for PortSettings {
 
 #[cfg(test)]
 mod tests {
-    use std::default::Default;
     use super::*;
+
+    fn default_port_settings() -> PortSettings {
+        PortSettings {
+            baud_rate: BaudRate::Baud9600,
+            char_size: CharSize::Bits8,
+            parity: Parity::ParityNone,
+            stop_bits: StopBits::Stop1,
+            flow_control: FlowControl::FlowNone,
+        }
+    }
 
     #[test]
     fn port_settings_manipulates_baud_rate() {
-        let mut settings: PortSettings = Default::default();
+        let mut settings: PortSettings = default_port_settings();
         settings.set_baud_rate(Baud115200).unwrap();
         assert_eq!(settings.baud_rate(), Some(Baud115200));
     }
 
     #[test]
     fn port_settings_manipulates_char_size() {
-        let mut settings: PortSettings = Default::default();
+        let mut settings: PortSettings = default_port_settings();
         settings.set_char_size(Bits7);
         assert_eq!(settings.char_size(), Some(Bits7));
     }
 
     #[test]
     fn port_settings_manipulates_parity() {
-        let mut settings: PortSettings = Default::default();
+        let mut settings: PortSettings = default_port_settings();
         settings.set_parity(ParityEven);
         assert_eq!(settings.parity(), Some(ParityEven));
     }
 
     #[test]
     fn port_settings_manipulates_stop_bits() {
-        let mut settings: PortSettings = Default::default();
+        let mut settings: PortSettings = default_port_settings();
         settings.set_stop_bits(Stop2);
         assert_eq!(settings.stop_bits(), Some(Stop2));
     }
 
     #[test]
     fn port_settings_manipulates_flow_control() {
-        let mut settings: PortSettings = Default::default();
+        let mut settings: PortSettings = default_port_settings();
         settings.set_flow_control(FlowSoftware);
         assert_eq!(settings.flow_control(), Some(FlowSoftware));
     }
