@@ -2,6 +2,13 @@
 name = "serial-unix"
 version = "0.4.0"
 authors = ["David Cuddeback <david.cuddeback@gmail.com>"]
+description = "Serial port implementation for Unix."
+homepage = "https://github.com/dcuddeback/serial-rs"
+repository = "https://github.com/dcuddeback/serial-rs"
+documentation = "https://dcuddeback.github.io/serial-rs/serial-unix/"
+license = "MIT"
+readme = "README.md"
+keywords = ["serial", "hardware", "system", "RS232"]
 
 [dependencies]
 serial-core = { path = "../serial-core" }
