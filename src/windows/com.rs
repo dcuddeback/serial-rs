@@ -20,6 +20,8 @@ pub struct COMPort {
     timeout: Duration
 }
 
+unsafe impl Send for COMPort {}
+
 impl COMPort {
     /// Opens a COM port as a serial device.
     ///
