@@ -25,9 +25,11 @@ const O_NOCTTY: c_int = 0;
 
 
 /// A TTY-based serial port implementation.
+///
+/// The port will be closed when the value is dropped.
 pub struct TTYPort {
-  fd: RawFd,
-  timeout: Duration
+    fd: RawFd,
+    timeout: Duration
 }
 
 impl TTYPort {

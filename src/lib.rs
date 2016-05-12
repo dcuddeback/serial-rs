@@ -359,9 +359,11 @@ pub enum FlowControl {
 /// set with the most recent successful call to `set_timeout()`. This timeout value should also be
 /// accessible by calling the `timeout()` method.
 ///
-/// Lastly, a serial port device should provide access to some basic control signals: RTS, DTR,
-/// CTS, DSR, RI, and CD. The values for the control signals are represented as boolean values,
-/// with `true` indicating the the control signal is active.
+/// A serial port device should also provide access to some basic control signals: RTS, DTR, CTS,
+/// DSR, RI, and CD. The values for the control signals are represented as boolean values, with
+/// `true` indicating the the control signal is active.
+///
+/// Lastly, types that implement `SerialDevice` should release any acquired resources when dropped.
 pub trait SerialDevice: io::Read+io::Write {
     /// A type that implements the settings for the serial port device.
     ///
@@ -498,6 +500,8 @@ pub trait SerialDevice: io::Read+io::Write {
 ///
 /// The `SerialPort` trait exposes several common control signals. Each control signal is
 /// represented as a boolean, where `true` indicates that the signal is asserted.
+///
+/// The serial port will be closed when the value is dropped.
 pub trait SerialPort: io::Read+io::Write {
     /// Returns the current timeout.
     fn timeout(&self) -> Duration;
