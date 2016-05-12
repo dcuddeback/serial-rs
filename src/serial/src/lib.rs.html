@@ -9,8 +9,8 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
     
@@ -907,6 +907,10 @@
 <span id="864">864</span>
 <span id="865">865</span>
 <span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>default</span>::<span class='ident'>Default</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>StdError</span>;
@@ -1269,9 +1273,11 @@
 <span class='doccomment'>/// set with the most recent successful call to `set_timeout()`. This timeout value should also be</span>
 <span class='doccomment'>/// accessible by calling the `timeout()` method.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// Lastly, a serial port device should provide access to some basic control signals: RTS, DTR,</span>
-<span class='doccomment'>/// CTS, DSR, RI, and CD. The values for the control signals are represented as boolean values,</span>
-<span class='doccomment'>/// with `true` indicating the the control signal is active.</span>
+<span class='doccomment'>/// A serial port device should also provide access to some basic control signals: RTS, DTR, CTS,</span>
+<span class='doccomment'>/// DSR, RI, and CD. The values for the control signals are represented as boolean values, with</span>
+<span class='doccomment'>/// `true` indicating the the control signal is active.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Lastly, types that implement `SerialDevice` should release any acquired resources when dropped.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>SerialDevice</span>: <span class='ident'>io</span>::<span class='ident'>Read</span><span class='op'>+</span><span class='ident'>io</span>::<span class='ident'>Write</span> {
     <span class='doccomment'>/// A type that implements the settings for the serial port device.</span>
     <span class='doccomment'>///</span>
@@ -1408,6 +1414,8 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// The `SerialPort` trait exposes several common control signals. Each control signal is</span>
 <span class='doccomment'>/// represented as a boolean, where `true` indicates that the signal is asserted.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The serial port will be closed when the value is dropped.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>SerialPort</span>: <span class='ident'>io</span>::<span class='ident'>Read</span><span class='op'>+</span><span class='ident'>io</span>::<span class='ident'>Write</span> {
     <span class='doccomment'>/// Returns the current timeout.</span>
     <span class='kw'>fn</span> <span class='ident'>timeout</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Duration</span>;
@@ -1818,7 +1826,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -1827,13 +1835,13 @@
     
 
     <script>
-        window.rootPath = "../../";
+        window.rootPath = "../../../";
         window.currentCrate = "serial";
         window.playgroundUrl = "";
     </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
     
-    <script defer src="../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

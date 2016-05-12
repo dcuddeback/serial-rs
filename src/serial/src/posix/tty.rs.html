@@ -9,8 +9,8 @@
 
     <title>tty.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css">
 
     
     
@@ -687,6 +687,8 @@
 <span id="644">644</span>
 <span id="645">645</span>
 <span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
 </pre><pre class='rust '>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>termios</span>;
@@ -715,9 +717,11 @@
 
 
 <span class='doccomment'>/// A TTY-based serial port implementation.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The port will be closed when the value is dropped.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>TTYPort</span> {
-  <span class='ident'>fd</span>: <span class='ident'>RawFd</span>,
-  <span class='ident'>timeout</span>: <span class='ident'>Duration</span>
+    <span class='ident'>fd</span>: <span class='ident'>RawFd</span>,
+    <span class='ident'>timeout</span>: <span class='ident'>Duration</span>
 }
 
 <span class='kw'>impl</span> <span class='ident'>TTYPort</span> {
@@ -1378,7 +1382,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
@@ -1387,13 +1391,13 @@
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../../../";
         window.currentCrate = "serial";
         window.playgroundUrl = "";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
+    <script src="../../../../jquery.js"></script>
+    <script src="../../../../main.js"></script>
     
-    <script defer src="../../../search-index.js"></script>
+    <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

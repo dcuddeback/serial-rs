@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/serial/lib.rs.html#1-866' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/serial/src/lib.rs.html#1-870' title='goto source code'>[src]</a></span></h1>
 <h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
 <table><tr><td><code>pub use <a class='enum' href='../serial/enum.BaudRate.html' title='serial::BaudRate'>BaudRate</a>::*;</code></td></tr><tr><td><code>pub use <a class='enum' href='../serial/enum.CharSize.html' title='serial::CharSize'>CharSize</a>::*;</code></td></tr><tr><td><code>pub use <a class='enum' href='../serial/enum.Parity.html' title='serial::Parity'>Parity</a>::*;</code></td></tr><tr><td><code>pub use <a class='enum' href='../serial/enum.StopBits.html' title='serial::StopBits'>StopBits</a>::*;</code></td></tr><tr><td><code>pub use <a class='enum' href='../serial/enum.FlowControl.html' title='serial::FlowControl'>FlowControl</a>::*;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
@@ -55,7 +55,6 @@
                                title='serial::posix'>posix</a></td>
                         <td class='docblock short'>
                              <p>Serial port implementation for POSIX-compliant operating systems.</p>
-
                         </td>
                     </tr>
                 
@@ -64,7 +63,6 @@
                                title='serial::prelude'>prelude</a></td>
                         <td class='docblock short'>
                              <p>A module that exports traits that are useful to have in scope.</p>
-
                         </td>
                     </tr>
                 </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
@@ -74,7 +72,6 @@
                                title='serial::Error'>Error</a></td>
                         <td class='docblock short'>
                              <p>An error type for serial port operations.</p>
-
                         </td>
                     </tr>
                 
@@ -83,7 +80,6 @@
                                title='serial::PortSettings'>PortSettings</a></td>
                         <td class='docblock short'>
                              <p>A device-indepenent implementation of serial port settings.</p>
-
                         </td>
                     </tr>
                 </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
@@ -93,7 +89,6 @@
                                title='serial::BaudRate'>BaudRate</a></td>
                         <td class='docblock short'>
                              <p>Serial port baud rates.</p>
-
                         </td>
                     </tr>
                 
@@ -102,7 +97,6 @@
                                title='serial::CharSize'>CharSize</a></td>
                         <td class='docblock short'>
                              <p>Number of bits per character.</p>
-
                         </td>
                     </tr>
                 
@@ -111,7 +105,6 @@
                                title='serial::ErrorKind'>ErrorKind</a></td>
                         <td class='docblock short'>
                              <p>Categories of errors that can occur when interacting with serial ports.</p>
-
                         </td>
                     </tr>
                 
@@ -120,7 +113,6 @@
                                title='serial::FlowControl'>FlowControl</a></td>
                         <td class='docblock short'>
                              <p>Flow control modes.</p>
-
                         </td>
                     </tr>
                 
@@ -129,7 +121,6 @@
                                title='serial::Parity'>Parity</a></td>
                         <td class='docblock short'>
                              <p>Parity checking modes.</p>
-
                         </td>
                     </tr>
                 
@@ -138,7 +129,6 @@
                                title='serial::StopBits'>StopBits</a></td>
                         <td class='docblock short'>
                              <p>Number of stop bits.</p>
-
                         </td>
                     </tr>
                 </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
@@ -148,7 +138,6 @@
                                title='serial::SerialDevice'>SerialDevice</a></td>
                         <td class='docblock short'>
                              <p>A trait for implementing serial devices.</p>
-
                         </td>
                     </tr>
                 
@@ -157,7 +146,6 @@
                                title='serial::SerialPort'>SerialPort</a></td>
                         <td class='docblock short'>
                              <p>A trait for serial port devices.</p>
-
                         </td>
                     </tr>
                 
@@ -166,7 +154,6 @@
                                title='serial::SerialPortSettings'>SerialPortSettings</a></td>
                         <td class='docblock short'>
                              <p>A trait for objects that implement serial port configurations.</p>
-
                         </td>
                     </tr>
                 </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
@@ -176,7 +163,6 @@
                                title='serial::open'>open</a></td>
                         <td class='docblock short'>
                              <p>A convenience function for opening a native serial port.</p>
-
                         </td>
                     </tr>
                 </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
@@ -186,7 +172,6 @@
                                title='serial::Result'>Result</a></td>
                         <td class='docblock short'>
                              <p>A type for results generated by interacting with serial ports.</p>
-
                         </td>
                     </tr>
                 
@@ -195,7 +180,6 @@
                                title='serial::SystemPort'>SystemPort</a></td>
                         <td class='docblock short'>
                              <p>A convenience type alias for the system&#39;s native serial port type.</p>
-
                         </td>
                     </tr>
                 </table></section>
@@ -241,7 +225,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>

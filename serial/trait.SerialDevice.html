@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-560' class='srclink' href='../src/serial/lib.rs.html#365-491' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-560' class='srclink' href='../src/serial/src/lib.rs.html#367-493' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait SerialDevice: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> {
     type Settings: <a class='trait' href='../serial/trait.SerialPortSettings.html' title='serial::SerialPortSettings'>SerialPortSettings</a>;
     fn <a href='#tymethod.read_settings' class='fnname'>read_settings</a>(&amp;self) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;Self::<a class='trait' href='../serial/trait.SerialDevice.html' title='serial::SerialDevice'>Settings</a>&gt;;
@@ -77,9 +77,11 @@ The <code>read()</code> and <code>write()</code> operations of these traits shou
 set with the most recent successful call to <code>set_timeout()</code>. This timeout value should also be
 accessible by calling the <code>timeout()</code> method.</p>
 
-<p>Lastly, a serial port device should provide access to some basic control signals: RTS, DTR,
-CTS, DSR, RI, and CD. The values for the control signals are represented as boolean values,
-with <code>true</code> indicating the the control signal is active.</p>
+<p>A serial port device should also provide access to some basic control signals: RTS, DTR, CTS,
+DSR, RI, and CD. The values for the control signals are represented as boolean values, with
+<code>true</code> indicating the the control signal is active.</p>
+
+<p>Lastly, types that implement <code>SerialDevice</code> should release any acquired resources when dropped.</p>
 </div>
             <h2 id='associated-types'>Associated Types</h2>
             <div class='methods'>
@@ -247,7 +249,7 @@ the underlying hardware:</p>
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>

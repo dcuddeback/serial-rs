@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-586' class='srclink' href='../src/serial/lib.rs.html#501-637' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-586' class='srclink' href='../src/serial/src/lib.rs.html#505-641' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait SerialPort: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a> {
     fn <a href='#tymethod.timeout' class='fnname'>timeout</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>;
     fn <a href='#tymethod.set_timeout' class='fnname'>set_timeout</a>(&amp;mut self, timeout: <a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;;
@@ -66,6 +66,8 @@ operations.</p>
 
 <p>The <code>SerialPort</code> trait exposes several common control signals. Each control signal is
 represented as a boolean, where <code>true</code> indicates that the signal is asserted.</p>
+
+<p>The serial port will be closed when the value is dropped.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
@@ -103,6 +105,7 @@ error while reading or writing the device&#39;s configuration settings:</p>
 <h2 id='example' class='section-header'><a href='#example'>Example</a></h2>
 <p>The following is a function that toggles a serial port&#39;s settings between one and two stop
 bits:</p>
+
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
 <span class='kw'>use</span> <span class='ident'>serial</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
@@ -238,7 +241,7 @@ the underlying hardware:</p>
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
