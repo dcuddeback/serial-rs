@@ -40,7 +40,10 @@ impl COMPort {
     /// * `InvalidInput` if `port` is not a valid device name.
     /// * `Io` for any other I/O error while opening or initializing the device.
     pub fn open<T: AsRef<OsStr> + ?Sized>(port: &T) -> ::Result<Self> {
-        let mut name: Vec<u16> = port.as_ref().encode_wide().collect();
+        let mut name = Vec::<u16>::new();
+
+        name.extend(OsStr::new("\\\\.\\").encode_wide());
+        name.extend(port.as_ref().encode_wide());
         name.push(0);
 
         let handle = unsafe {
