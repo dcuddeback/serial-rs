@@ -69,3 +69,6 @@ libudev = "0.2.0"
 [target.x86_64-unknown-openbsd.dependencies]
 termios = "0.2.2"
 ioctl-rs = "0.1.5"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.3"

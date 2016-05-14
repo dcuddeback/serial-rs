@@ -1,4 +1,5 @@
 extern crate libc;
+extern crate winreg;
 
 use std::ffi::OsStr;
 use std::io;
@@ -6,12 +7,16 @@ use std::mem;
 use std::ptr;
 use std::time::Duration;
 
+use self::winreg::RegKey;
+use self::winreg::types::FromRegValue;
+use self::winreg::enums::*;
+
 use std::os::windows::prelude::*;
 
 use self::libc::c_void;
 
 use super::ffi::*;
-use ::{SerialDevice,SerialPortSettings};
+use ::{SerialDevice,SerialPortSettings,PortInfo};
 
 
 /// A serial port implementation for Windows COM ports.
@@ -333,4 +338,18 @@ impl SerialPortSettings for COMSettings {
             }
         }
     }
+}
+
+pub fn list_ports() -> ::Result<Vec<PortInfo>> {
+    let mut vec = Vec::new();
+    let system = try!(RegKey::predef(HKEY_LOCAL_MACHINE)
+        .open_subkey_with_flags("HARDWARE\\DEVICEMAP\\SERIALCOMM", KEY_READ));
+    for reg_val in system.enum_values() {
+        if let Ok((_, value)) = reg_val {
+            if let Ok(val_str) = FromRegValue::from_reg_value(&value) {
+                vec.push(PortInfo { port_name: val_str });
+            }
+        }
+    }
+    Ok(vec)
 }
