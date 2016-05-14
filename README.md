@@ -85,6 +85,7 @@ cargo build --target=arm-unknown-linux-gnueabihf
 ## Contributors
 * [dcuddeback](https://github.com/dcuddeback)
 * [willem66745](https://github.com/willem66745)
+* [apoloval](https://github.com/apoloval)
 
 ## License
 Copyright © 2015 David Cuddeback
