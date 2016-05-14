@@ -890,3 +890,8 @@ pub fn list_ports() -> Result<Vec<PortInfo>> {
 pub fn list_ports() -> Result<Vec<PortInfo>> {
     windows::list_ports()
 }
+
+#[cfg(not(any(target_os = "linux", target_os = "windows")))]
+pub fn list_ports() -> Result<Vec<PortInfo>> {
+    Err(Error::new(ErrorKind::Unknown, "list_ports() not implemented for platform"))
+}
