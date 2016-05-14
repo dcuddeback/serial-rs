@@ -885,3 +885,8 @@ pub struct PortInfo {
 pub fn list_ports() -> Result<Vec<PortInfo>> {
     posix::list_ports()
 }
+
+#[cfg(target_os = "windows")]
+pub fn list_ports() -> Result<Vec<PortInfo>> {
+    windows::list_ports()
+}
