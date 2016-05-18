@@ -364,7 +364,7 @@ pub enum FlowControl {
 /// `true` indicating the the control signal is active.
 ///
 /// Lastly, types that implement `SerialDevice` should release any acquired resources when dropped.
-pub trait SerialDevice: io::Read+io::Write {
+pub trait SerialDevice: io::Read+io::Write+Sized {
     /// A type that implements the settings for the serial port device.
     ///
     /// The `Settings` type is used to retrieve and modify the serial port's settings. This type
@@ -372,6 +372,13 @@ pub trait SerialDevice: io::Read+io::Write {
     /// not cause any changes in the underlying hardware until written to the device with
     /// `write_settings()`.
     type Settings: SerialPortSettings;
+    
+    /// Creates a new independently owned handle to the underlying port.
+    ///
+    /// The returned `Self::Port` is a reference to the same serial device tha this object
+    /// references. Both handles will read and write the same stream of data, and options set on
+    /// one stream will be propagated to the other stream.
+    fn try_clone(&self) -> ::Result<Self>;
 
     /// Returns the device's current settings.
     ///
@@ -502,7 +509,11 @@ pub trait SerialDevice: io::Read+io::Write {
 /// represented as a boolean, where `true` indicates that the signal is asserted.
 ///
 /// The serial port will be closed when the value is dropped.
-pub trait SerialPort: io::Read+io::Write {
+pub trait SerialPort: io::Read+io::Write+Sized {
+
+	/// Attempts to clone the current port    
+    fn try_clone(&self) -> ::Result<Self>;
+    
     /// Returns the current timeout.
     fn timeout(&self) -> Duration;
 
@@ -641,6 +652,11 @@ pub trait SerialPort: io::Read+io::Write {
 }
 
 impl<T> SerialPort for T where T: SerialDevice {
+    
+    fn try_clone(&self) -> ::Result<T> {
+        T::try_clone(self)
+    }
+    
     fn timeout(&self) -> Duration {
         T::timeout(self)
     }

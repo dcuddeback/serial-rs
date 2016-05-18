@@ -160,6 +160,10 @@ impl io::Write for TTYPort {
 impl SerialDevice for TTYPort {
     type Settings = TTYSettings;
 
+    fn try_clone(&self) -> ::Result<TTYPort> {
+        unimplemented!()
+    }
+
     fn read_settings(&self) -> ::Result<TTYSettings> {
         use self::termios::{CREAD,CLOCAL}; // cflags
         use self::termios::{ICANON,ECHO,ECHOE,ECHOK,ECHONL,ISIG,IEXTEN}; // lflags

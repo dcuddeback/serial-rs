@@ -137,6 +137,10 @@ impl io::Write for COMPort {
 
 impl SerialDevice for COMPort {
     type Settings = COMSettings;
+    
+    fn try_clone(&self) -> ::Result<COMPort> {
+        unimplemented!()
+    }
 
     fn read_settings(&self) -> ::Result<COMSettings> {
         let mut dcb = DCB::new();
