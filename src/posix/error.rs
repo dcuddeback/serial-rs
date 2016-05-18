@@ -23,7 +23,7 @@ pub fn from_raw_os_error(errno: i32) -> ::Error {
         _ => ::ErrorKind::Io(io::ErrorKind::Other)
     };
 
-    ::Error::new(kind, error_string(errno))
+    ::Error::new(errno,kind, error_string(errno))
 }
 
 pub fn from_io_error(io_error: io::Error) -> ::Error {
