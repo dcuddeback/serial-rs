@@ -100,7 +100,11 @@ impl StdError for Error {
 
 impl From<io::Error> for Error {
     fn from(io_error: io::Error) -> Error {
-        Error::new(0,ErrorKind::Io(io_error.kind()), format!("{}", io_error))
+        let err_no = match io_error.raw_os_error() {
+            Option::Some(x) => x,
+            Option::None => 0
+        };
+        Error::new(err_no,ErrorKind::Io(io_error.kind()), format!("{}", io_error))
     }
 }
 
