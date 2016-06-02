@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.3.4 (2016-06-01)
+### Fixed
+* ([#16](https://github.com/dcuddeback/serial-rs/issues/16))
+  Added missing `Send` implementation for Windows COM ports.
+* ([#18](https://github.com/dcuddeback/serial-rs/issues/18))
+  Fixed bug to allow opening non-standard Windows COM ports by name.
+* ([#27](https://github.com/dcuddeback/serial-rs/issues/18))
+  Added missing `Debug` implementation for Unix TTY port settings.
+
 ## 0.3.3 (2016-03-20)
 ### Added
 * Added support for OpenBSD.
