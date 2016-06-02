@@ -235,7 +235,7 @@ impl SerialDevice for TTYPort {
 }
 
 /// Serial port settings for TTY devices.
-#[derive(Copy,Clone)]
+#[derive(Debug,Copy,Clone)]
 pub struct TTYSettings {
     termios: termios::Termios
 }
