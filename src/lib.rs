@@ -49,7 +49,10 @@ pub enum ErrorKind {
     /// A parameter was incorrect.
     InvalidInput,
 
-    /// An I/O error occured.
+    /// An unknown error occurred.
+    Unknown,
+
+    /// An I/O error occurred.
     ///
     /// The type of I/O error is determined by the inner `io::ErrorKind`.
     Io(io::ErrorKind)
@@ -99,6 +102,7 @@ impl From<Error> for io::Error {
         let kind = match error.kind {
             ErrorKind::NoDevice => io::ErrorKind::NotFound,
             ErrorKind::InvalidInput => io::ErrorKind::InvalidInput,
+            ErrorKind::Unknown => io::ErrorKind::Other,
             ErrorKind::Io(kind) => kind
         };
 
@@ -867,4 +871,27 @@ mod tests {
         settings.set_flow_control(FlowSoftware);
         assert_eq!(settings.flow_control(), Some(FlowSoftware));
     }
+}
+
+
+/// A device-independent implementation of serial port information.
+#[derive(Debug,Clone,PartialEq,Eq)]
+pub struct PortInfo {
+    /// Port name
+    pub port_name: String,
+}
+
+#[cfg(target_os = "linux")]
+pub fn list_ports() -> Result<Vec<PortInfo>> {
+    posix::list_ports()
+}
+
+#[cfg(target_os = "windows")]
+pub fn list_ports() -> Result<Vec<PortInfo>> {
+    windows::list_ports()
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "windows")))]
+pub fn list_ports() -> Result<Vec<PortInfo>> {
+    Err(Error::new(ErrorKind::Unknown, "list_ports() not implemented for platform"))
 }

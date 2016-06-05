@@ -1,4 +1,6 @@
 extern crate libc;
+#[cfg(target_os = "linux")]
+extern crate libudev;
 
 use std::error::Error;
 use std::ffi::CStr;
@@ -33,6 +35,18 @@ pub fn from_io_error(io_error: io::Error) -> ::Error {
             let description = io_error.description().to_string();
 
             ::Error::new(::ErrorKind::Io(io_error.kind()), description)
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+impl From<libudev::Error> for ::Error {
+    fn from(e: libudev::Error) -> ::Error {
+        let description = e.description().to_string();
+        match e.kind() {
+            libudev::ErrorKind::NoMem => ::Error::new(::ErrorKind::Unknown, description),
+            libudev::ErrorKind::InvalidInput => ::Error::new(::ErrorKind::InvalidInput, description),
+            libudev::ErrorKind::Io(a) => ::Error::new(::ErrorKind::Io(a), description)
         }
     }
 }
