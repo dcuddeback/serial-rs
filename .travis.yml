@@ -1,8 +1,9 @@
 language: rust
+sudo: false
 os:
   - linux
   - osx
 rust:
-  - 1.3.0
+  - 1.8.0
   - stable
   - beta
