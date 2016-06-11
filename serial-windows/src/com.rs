@@ -143,7 +143,12 @@ impl SerialDevice for COMPort {
 
         match unsafe { GetCommState(self.handle, &mut dcb) } {
             0 => Err(error::last_os_error()),
-            _ => Ok(COMSettings { inner: dcb }),
+            _ => {
+                dcb.fBits |= fBinary;
+                dcb.fBits &= fDtrControl;
+
+                Ok(COMSettings { inner: dcb })
+            }
 
         }
     }
@@ -306,7 +311,7 @@ impl SerialPortSettings for COMSettings {
             core::Bits6 => 6,
             core::Bits7 => 7,
             core::Bits8 => 8,
-        }
+        };
     }
 
     fn set_parity(&mut self, parity: core::Parity) {
@@ -314,6 +319,13 @@ impl SerialPortSettings for COMSettings {
             core::ParityNone => NOPARITY,
             core::ParityOdd  => ODDPARITY,
             core::ParityEven => EVENPARITY,
+        };
+
+        if parity == core::ParityNone {
+            self.inner.fBits &= !fParity;
+        }
+        else {
+            self.inner.fBits |= fParity;
         }
     }
 
@@ -321,7 +333,7 @@ impl SerialPortSettings for COMSettings {
         self.inner.StopBits = match stop_bits {
             core::Stop1 => ONESTOPBIT,
             core::Stop2 => TWOSTOPBITS,
-        }
+        };
     }
 
     fn set_flow_control(&mut self, flow_control: core::FlowControl) {
