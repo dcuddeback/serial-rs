@@ -5,13 +5,46 @@ extern crate ioctl_rs as ioctl;
 use std::ffi::CString;
 use std::io;
 use std::path::Path;
+use std::sync::{Arc,Mutex};
 use std::time::Duration;
 
 use std::os::unix::prelude::*;
 
 use self::libc::{c_int,c_void,size_t};
 
-use ::{SerialDevice,SerialPortSettings};
+use ::{SerialDevice,SerialPortSettings,TryClone};
+
+
+#[derive(Clone)]
+struct RefCount {
+    count: Arc<Mutex<usize>>,
+}
+
+impl RefCount {
+    fn new(count: usize) -> Self {
+        RefCount {
+            count: Arc::new(Mutex::new(count)),
+        }
+    }
+
+    fn increment(&self) -> usize {
+        let mut ref_count = self.count.lock().unwrap();
+
+        assert!(*ref_count < usize::max_value(), "overflowed reference count");
+
+        *ref_count += 1;
+        Ok(*ref_count)
+    }
+
+    fn decrement(&self) -> usize {
+        let mut ref_count = self.count.lock().unwrap();
+
+        assert!(*ref_count > usize::min_value(), "underflowed reference count");
+
+        *ref_count -= 1;
+        Ok(*ref_count)
+    }
+}
 
 
 #[cfg(target_os = "linux")]
@@ -29,7 +62,8 @@ const O_NOCTTY: c_int = 0;
 /// The port will be closed when the value is dropped.
 pub struct TTYPort {
     fd: RawFd,
-    timeout: Duration
+    timeout: Duration,
+    ref_count: RefCount,
 }
 
 impl TTYPort {
@@ -64,7 +98,8 @@ impl TTYPort {
 
         let mut port = TTYPort {
             fd: fd,
-            timeout: Duration::from_millis(100)
+            timeout: Duration::from_millis(100),
+            ref_count: RefCount::new(1),
         };
 
         // get exclusive access to device
@@ -108,12 +143,33 @@ impl TTYPort {
 
 impl Drop for TTYPort {
     fn drop(&mut self) {
-        #![allow(unused_must_use)]
-        ioctl::tiocnxcl(self.fd);
+        if self.ref_count.decrement() == 0 {
+            #[allow(unused_must_use)]
+            ioctl::tiocnxcl(self.fd);
+        }
 
         unsafe {
             libc::close(self.fd);
         }
+    }
+}
+
+impl TryClone for TTYPort {
+    fn try_clone(&self) -> ::Result<Self> {
+        self.ref_count.increment();
+
+        let fd = unsafe { libc::dup(self.fd) };
+
+        if fd < 0 {
+            self.ref_count.decrement();
+            return Err(super::error::last_os_error());
+        }
+
+        Ok(TTYPort {
+            fd: fd,
+            timeout: self.timeout.clone(),
+            ref_count: self.ref_count.clone(),
+        })
     }
 }
 

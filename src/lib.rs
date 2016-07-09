@@ -692,6 +692,10 @@ impl<T> SerialPort for T where T: SerialDevice {
     }
 }
 
+pub trait TryClone: Sized {
+    fn try_clone(&self) -> ::Result<Self>;
+}
+
 /// A trait for objects that implement serial port configurations.
 pub trait SerialPortSettings {
     /// Returns the current baud rate.
