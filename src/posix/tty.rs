@@ -23,6 +23,10 @@ const O_NOCTTY: c_int = 0x00020000;
 #[cfg(not(any(target_os = "linux", target_os = "macos")))]
 const O_NOCTTY: c_int = 0;
 
+// FIXME: This constant should move to the termios crate
+#[cfg(target_os = "linux")]
+const TCSETS2: c_int = -2144578518;
+
 
 /// A TTY-based serial port implementation.
 ///
@@ -184,9 +188,21 @@ impl SerialDevice for TTYPort {
         Ok(TTYSettings::new(termios))
     }
 
+    #[cfg(target_os = "linux")]
     fn write_settings(&mut self, settings: &TTYSettings) -> ::Result<()> {
-        use self::termios::{tcsetattr,tcflush};
-        use self::termios::{TCSANOW,TCIOFLUSH};
+        let err = unsafe { ioctl::ioctl(self.fd, TCSETS2, &settings.termios) };
+
+        if err != 0 {
+            return Err(super::error::from_raw_os_error(err));
+        }
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    fn write_settings(&mut self, settings: &TTYSettings) -> ::Result<()> {
+        use self::termios::{tcsetattr, tcflush};
+        use self::termios::{TCSANOW, TCIOFLUSH};
+
 
         // write settings to TTY
         if let Err(err) = tcsetattr(self.fd, TCSANOW, &settings.termios) {
