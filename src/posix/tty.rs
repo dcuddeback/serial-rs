@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use std::os::unix::prelude::*;
 
-use self::libc::{c_int,c_void,size_t};
+use self::libc::{c_int,c_uint,c_void,size_t};
 
 use ::{SerialDevice,SerialPortSettings};
 
@@ -22,6 +22,10 @@ const O_NOCTTY: c_int = 0x00020000;
 
 #[cfg(not(any(target_os = "linux", target_os = "macos")))]
 const O_NOCTTY: c_int = 0;
+
+// FIXME: This constant should move to the termios crate
+#[cfg(target_os = "linux")]
+const BOTHER: c_uint = 0x1000;
 
 // FIXME: This constant should move to the termios crate
 #[cfg(target_os = "linux")]
@@ -470,7 +474,24 @@ impl SerialPortSettings for TTYSettings {
             #[cfg(target_os = "linux")]
             ::BaudOther(4000000) => B4000000,
 
-            ::BaudOther(_) => return Err(super::error::from_raw_os_error(EINVAL))
+            ::BaudOther(rate) => {
+                // Custom baud rates are only supported on Linux for now.
+                // Test this on other platforms and remove the early
+                // return for those that pass/support this feature
+                #[cfg(target_os = "linux")]
+                {
+                    use self::termios::os::linux::CBAUD;
+
+                    self.termios.c_cflag &= !CBAUD;
+                    self.termios.c_cflag |= BOTHER;
+                    self.termios.c_ispeed = rate as c_uint;
+                    self.termios.c_ospeed = rate as c_uint;
+
+                    return Ok(());
+                }
+
+                return Err(super::error::from_raw_os_error(EINVAL));
+            }
         };
 
         match cfsetspeed(&mut self.termios, baud) {
