@@ -344,6 +344,15 @@ impl SerialPortSettings for TTYSettings {
             B3500000 => Some(::BaudOther(3500000)),
             #[cfg(target_os = "linux")]
             B4000000 => Some(::BaudOther(4000000)),
+            #[cfg(target_os = "linux")]
+            BOTHER => {
+
+                if self.termios.c_ospeed != self.termios.c_ispeed {
+                    return None;
+                }
+
+                Some(::BaudOther(self.termios.c_ospeed as usize))
+            }
 
             _ => None
         }
@@ -596,6 +605,14 @@ mod tests {
         settings.set_baud_rate(::Baud600).unwrap();
         settings.set_baud_rate(::Baud1200).unwrap();
         assert_eq!(settings.baud_rate(), Some(::Baud1200));
+    }
+
+    #[test]
+    fn tty_settings_sets_nonstandard_baud_rate() {
+        let mut settings = default_settings();
+
+        settings.set_baud_rate(::BaudOther(12345)).unwrap();
+        assert_eq!(settings.baud_rate(), Some(::BaudOther(12345)));
     }
 
     #[test]
