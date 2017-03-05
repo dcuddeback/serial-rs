@@ -414,7 +414,6 @@ impl SerialPortSettings for TTYSettings {
     }
 
     fn set_baud_rate(&mut self, baud_rate: ::BaudRate) -> ::Result<()> {
-        use self::libc::{EINVAL};
         use self::termios::cfsetspeed;
         use self::termios::{B50,B75,B110,B134,B150,B200,B300,B600,B1200,B1800,B2400,B4800,B9600,B19200,B38400};
         use self::termios::os::target::{B57600,B115200,B230400};
@@ -499,7 +498,11 @@ impl SerialPortSettings for TTYSettings {
                     return Ok(());
                 }
 
-                return Err(super::error::from_raw_os_error(EINVAL));
+                #[cfg(not(target_os = "linux"))]
+                {
+                    use self::libc::EINVAL;
+                    return Err(super::error::from_raw_os_error(EINVAL));
+                }
             }
         };
 
