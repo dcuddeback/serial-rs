@@ -29,7 +29,7 @@ const BOTHER: c_uint = 0x1000;
 
 // FIXME: This constant should move to the termios crate
 #[cfg(target_os = "linux")]
-const TCSETS2: c_int = -2144578518;
+const TCSETS2: c_int = 0x402c542b;
 
 
 /// A TTY-based serial port implementation.
