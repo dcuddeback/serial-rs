@@ -68,3 +68,7 @@ ioctl-rs = "0.1.5"
 [target.x86_64-unknown-openbsd.dependencies]
 termios = "0.2.2"
 ioctl-rs = "0.1.5"
+
+[target.x86_64-unknown-linux-musl.dependencies]
+termios = "0.2.2"
+ioctl-rs = "0.1.5"
