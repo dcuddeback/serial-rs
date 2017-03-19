@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use std::os::unix::prelude::*;
 
-use self::libc::{c_int,c_void,size_t};
+use self::libc::{c_int,c_uint,c_void,size_t};
 
 use ::{SerialDevice,SerialPortSettings};
 
@@ -22,6 +22,14 @@ const O_NOCTTY: c_int = 0x00020000;
 
 #[cfg(not(any(target_os = "linux", target_os = "macos")))]
 const O_NOCTTY: c_int = 0;
+
+// FIXME: This constant should move to the termios crate
+#[cfg(target_os = "linux")]
+const BOTHER: c_uint = 0x1000;
+
+// FIXME: This constant should move to the termios crate
+#[cfg(target_os = "linux")]
+const TCSETS2: c_int = 0x402c542b;
 
 
 /// A TTY-based serial port implementation.
@@ -184,9 +192,21 @@ impl SerialDevice for TTYPort {
         Ok(TTYSettings::new(termios))
     }
 
+    #[cfg(target_os = "linux")]
     fn write_settings(&mut self, settings: &TTYSettings) -> ::Result<()> {
-        use self::termios::{tcsetattr,tcflush};
-        use self::termios::{TCSANOW,TCIOFLUSH};
+        let err = unsafe { ioctl::ioctl(self.fd, TCSETS2, &settings.termios) };
+
+        if err != 0 {
+            return Err(super::error::from_raw_os_error(err));
+        }
+        Ok(())
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    fn write_settings(&mut self, settings: &TTYSettings) -> ::Result<()> {
+        use self::termios::{tcsetattr, tcflush};
+        use self::termios::{TCSANOW, TCIOFLUSH};
+
 
         // write settings to TTY
         if let Err(err) = tcsetattr(self.fd, TCSANOW, &settings.termios) {
@@ -324,6 +344,15 @@ impl SerialPortSettings for TTYSettings {
             B3500000 => Some(::BaudOther(3500000)),
             #[cfg(target_os = "linux")]
             B4000000 => Some(::BaudOther(4000000)),
+            #[cfg(target_os = "linux")]
+            BOTHER => {
+
+                if self.termios.c_ospeed != self.termios.c_ispeed {
+                    return None;
+                }
+
+                Some(::BaudOther(self.termios.c_ospeed as usize))
+            }
 
             _ => None
         }
@@ -385,7 +414,6 @@ impl SerialPortSettings for TTYSettings {
     }
 
     fn set_baud_rate(&mut self, baud_rate: ::BaudRate) -> ::Result<()> {
-        use self::libc::{EINVAL};
         use self::termios::cfsetspeed;
         use self::termios::{B50,B75,B110,B134,B150,B200,B300,B600,B1200,B1800,B2400,B4800,B9600,B19200,B38400};
         use self::termios::os::target::{B57600,B115200,B230400};
@@ -454,7 +482,28 @@ impl SerialPortSettings for TTYSettings {
             #[cfg(target_os = "linux")]
             ::BaudOther(4000000) => B4000000,
 
-            ::BaudOther(_) => return Err(super::error::from_raw_os_error(EINVAL))
+            ::BaudOther(rate) => {
+                // Custom baud rates are only supported on Linux for now.
+                // Test this on other platforms and remove the early
+                // return for those that pass/support this feature
+                #[cfg(target_os = "linux")]
+                {
+                    use self::termios::os::linux::CBAUD;
+
+                    self.termios.c_cflag &= !CBAUD;
+                    self.termios.c_cflag |= BOTHER;
+                    self.termios.c_ispeed = rate as c_uint;
+                    self.termios.c_ospeed = rate as c_uint;
+
+                    return Ok(());
+                }
+
+                #[cfg(not(target_os = "linux"))]
+                {
+                    use self::libc::EINVAL;
+                    return Err(super::error::from_raw_os_error(EINVAL));
+                }
+            }
         };
 
         match cfsetspeed(&mut self.termios, baud) {
@@ -559,6 +608,14 @@ mod tests {
         settings.set_baud_rate(::Baud600).unwrap();
         settings.set_baud_rate(::Baud1200).unwrap();
         assert_eq!(settings.baud_rate(), Some(::Baud1200));
+    }
+
+    #[test]
+    fn tty_settings_sets_nonstandard_baud_rate() {
+        let mut settings = default_settings();
+
+        settings.set_baud_rate(::BaudOther(12345)).unwrap();
+        assert_eq!(settings.baud_rate(), Some(::BaudOther(12345)));
     }
 
     #[test]
