@@ -1,4 +1,4 @@
-# Serial Port Core
+# Serial Core
 
 The `serial-core` crate provides abstract types used to interface with and implement serial ports.
 They can be used to write code that functions generically over all serial port types and to
