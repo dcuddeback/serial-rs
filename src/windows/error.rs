@@ -17,7 +17,7 @@ pub fn last_os_error() -> ::Error {
         _ => ::ErrorKind::Io(io::ErrorKind::Other)
     };
 
-    ::Error::new(kind, error_string(errno).trim())
+    ::Error::new(errno,kind, error_string(errno).trim())
 }
 
 // the rest of this module is borrowed from libstd

@@ -59,20 +59,30 @@ pub enum ErrorKind {
 #[derive(Debug)]
 pub struct Error {
     kind: ErrorKind,
-    description: String
+    description: String,
+    code: i32
 }
 
 impl Error {
-    pub fn new<T: Into<String>>(kind: ErrorKind, description: T) -> Self {
+    pub fn new<T: Into<String>>(err_code: i32, kind: ErrorKind, description: T) -> Self {
         Error {
             kind: kind,
-            description: description.into()
+            description: description.into(),
+            code: err_code
         }
     }
 
     /// Returns the corresponding `ErrorKind` for this error.
     pub fn kind(&self) -> ErrorKind {
         self.kind
+    }
+
+    /// Attempts to return the OS-Native error code
+    pub fn raw_os_error(&self) -> Option<i32> {
+        match self.code {
+            0 => None,
+            _ => Some(self.code)
+        }
     }
 }
 
@@ -90,7 +100,11 @@ impl StdError for Error {
 
 impl From<io::Error> for Error {
     fn from(io_error: io::Error) -> Error {
-        Error::new(ErrorKind::Io(io_error.kind()), format!("{}", io_error))
+        let err_no = match io_error.raw_os_error() {
+            Option::Some(x) => x,
+            Option::None => 0
+        };
+        Error::new(err_no,ErrorKind::Io(io_error.kind()), format!("{}", io_error))
     }
 }
 
