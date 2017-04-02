@@ -137,6 +137,26 @@ impl io::Write for COMPort {
 
 impl SerialDevice for COMPort {
     type Settings = COMSettings;
+    
+    fn try_clone(&self) -> ::Result<COMPort> {
+        let mut new_handle: HANDLE = ptr::null_mut() as HANDLE;
+        match unsafe { DuplicateHandle(
+                GetCurrentProcess(),
+	   			self.handle,
+				GetCurrentProcess(),
+				&mut new_handle as *mut HANDLE,
+				0,
+				0,
+				DUPLICATE_SAME_ACCESS) } {
+	    	0 => Err(super::error::last_os_error()),
+	    	_ => {
+	    	    Ok(COMPort {
+	    	        handle: new_handle,
+	    	        timeout: self.timeout,
+	    	    })
+	    	},
+        }
+    }
 
     fn read_settings(&self) -> ::Result<COMSettings> {
         let mut dcb = DCB::new();

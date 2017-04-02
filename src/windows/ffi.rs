@@ -19,12 +19,14 @@ pub type LPCWSTR = *const WCHAR;
 pub type LPWSTR = *mut WCHAR;
 
 pub type HANDLE = *mut LPVOID;
+pub type LPHANDLE = *mut HANDLE;
 
 pub const GENERIC_READ: DWORD = 0x80000000;
 pub const GENERIC_WRITE: DWORD = 0x40000000;
 pub const OPEN_EXISTING: DWORD = 3;
 pub const FILE_ATTRIBUTE_NORMAL: DWORD = 0x80;
 pub const INVALID_HANDLE_VALUE: HANDLE = !0 as HANDLE;
+pub const DUPLICATE_SAME_ACCESS: DWORD = 0x00000002;
 
 #[repr(C)]
 pub struct SECURITY_ATTRIBUTES {
@@ -154,6 +156,13 @@ extern "system" {
                        dwFlagsAndAttributes: DWORD,
                        hTemplmateFile: HANDLE) -> HANDLE;
     pub fn CloseHandle(hObject: HANDLE) -> BOOL;
+    pub fn DuplicateHandle(hResourceProcessHAndle: HANDLE,
+        				   hSourceHandle: HANDLE,
+        				   hTargetProcessHandle: HANDLE,
+        				   lpTargetHandle: LPHANDLE,
+        				   dwDesiredAccess: DWORD,
+        				   bInheritHandle: BOOL,
+        				   dwOptions: DWORD) -> BOOL;
     pub fn ReadFile(hFile: HANDLE,
                     lpBuffer: LPVOID,
                     nNumberOfBytesToRead: DWORD,
@@ -174,4 +183,5 @@ extern "system" {
     pub fn GetCommModemStatus(hFile: HANDLE, lpModemStat: *mut DWORD) -> BOOL;
 
     pub fn GetLastError() -> DWORD;
+    pub fn GetCurrentProcess() -> HANDLE;
 }
