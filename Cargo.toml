@@ -1,0 +1,2 @@
+[workspace]
+members = ["serial-core", "serial-unix", "serial-windows", "serial"]

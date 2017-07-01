@@ -11,7 +11,7 @@ readme = "README.md"
 keywords = ["serial", "hardware", "system", "RS232"]
 
 [dependencies]
-serial-core = { path = "../serial-core" }
+serial-core = { version = "0.4", path = "../serial-core" }
 libc = "0.2.1"
 termios = "0.2.2"
 ioctl-rs = "0.1.5"
