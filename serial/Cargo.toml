@@ -9,6 +9,7 @@ documentation = "https://dcuddeback.github.io/serial-rs/serial/"
 license = "MIT"
 readme = "README.md"
 keywords = ["serial", "hardware", "system", "RS232"]
+categories = ["hardware-support", "os"]
 
 [dependencies]
 serial-core = { version = "=0.4.0", path = "../serial-core" }
