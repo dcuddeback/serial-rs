@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `PortSettings` struct in crate `serial_core`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, PortSettings">
+
+    <title>serial_core::PortSettings - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct PortSettings</p><div class="block items"><ul><li><a href="#fields">Fields</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>serial_core</a></p><script>window.sidebarCurrent = {name: 'PortSettings', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>serial_core</a>::<wbr><a class="struct" href=''>PortSettings</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/serial_core/lib.rs.html#694-709' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct PortSettings {
+    pub baud_rate: <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a>,
+    pub char_size: <a class="enum" href="../serial_core/enum.CharSize.html" title="enum serial_core::CharSize">CharSize</a>,
+    pub parity: <a class="enum" href="../serial_core/enum.Parity.html" title="enum serial_core::Parity">Parity</a>,
+    pub stop_bits: <a class="enum" href="../serial_core/enum.StopBits.html" title="enum serial_core::StopBits">StopBits</a>,
+    pub flow_control: <a class="enum" href="../serial_core/enum.FlowControl.html" title="enum serial_core::FlowControl">FlowControl</a>,
+}</pre><div class='docblock'><p>A device-indepenent implementation of serial port settings.</p>
+</div><h2 id='fields' class='fields'>Fields</h2><span id='structfield.baud_rate' class="structfield">
+                           <span id='baud_rate.v' class='invisible'>
+                           <code>baud_rate: <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code>
+                           </span></span><div class='docblock'><p>Baud rate.</p>
+</div><span id='structfield.char_size' class="structfield">
+                           <span id='char_size.v' class='invisible'>
+                           <code>char_size: <a class="enum" href="../serial_core/enum.CharSize.html" title="enum serial_core::CharSize">CharSize</a></code>
+                           </span></span><div class='docblock'><p>Character size.</p>
+</div><span id='structfield.parity' class="structfield">
+                           <span id='parity.v' class='invisible'>
+                           <code>parity: <a class="enum" href="../serial_core/enum.Parity.html" title="enum serial_core::Parity">Parity</a></code>
+                           </span></span><div class='docblock'><p>Parity checking mode.</p>
+</div><span id='structfield.stop_bits' class="structfield">
+                           <span id='stop_bits.v' class='invisible'>
+                           <code>stop_bits: <a class="enum" href="../serial_core/enum.StopBits.html" title="enum serial_core::StopBits">StopBits</a></code>
+                           </span></span><div class='docblock'><p>Number of stop bits.</p>
+</div><span id='structfield.flow_control' class="structfield">
+                           <span id='flow_control.v' class='invisible'>
+                           <code>flow_control: <a class="enum" href="../serial_core/enum.FlowControl.html" title="enum serial_core::FlowControl">FlowControl</a></code>
+                           </span></span><div class='docblock'><p>Flow control mode.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#693' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#693' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#693' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#693' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#693' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="../serial_core/trait.SerialPortSettings.html" title="trait serial_core::SerialPortSettings">SerialPortSettings</a> for <a class="struct" href="../serial_core/struct.PortSettings.html" title="struct serial_core::PortSettings">PortSettings</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#711-752' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.baud_rate' class="method"><span id='baud_rate.v-1' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.baud_rate' class='fnname'>baud_rate</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the current baud rate. <a href="../serial_core/trait.SerialPortSettings.html#tymethod.baud_rate">Read more</a></p>
+</div><h4 id='method.char_size' class="method"><span id='char_size.v-1' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.char_size' class='fnname'>char_size</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="../serial_core/enum.CharSize.html" title="enum serial_core::CharSize">CharSize</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the character size. <a href="../serial_core/trait.SerialPortSettings.html#tymethod.char_size">Read more</a></p>
+</div><h4 id='method.parity' class="method"><span id='parity.v-1' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.parity' class='fnname'>parity</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="../serial_core/enum.Parity.html" title="enum serial_core::Parity">Parity</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the parity-checking mode. <a href="../serial_core/trait.SerialPortSettings.html#tymethod.parity">Read more</a></p>
+</div><h4 id='method.stop_bits' class="method"><span id='stop_bits.v-1' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.stop_bits' class='fnname'>stop_bits</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="../serial_core/enum.StopBits.html" title="enum serial_core::StopBits">StopBits</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the number of stop bits. <a href="../serial_core/trait.SerialPortSettings.html#tymethod.stop_bits">Read more</a></p>
+</div><h4 id='method.flow_control' class="method"><span id='flow_control.v-1' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.flow_control' class='fnname'>flow_control</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="../serial_core/enum.FlowControl.html" title="enum serial_core::FlowControl">FlowControl</a>&gt;</code></span></h4>
+<div class='docblock'><p>Returns the flow control mode. <a href="../serial_core/trait.SerialPortSettings.html#tymethod.flow_control">Read more</a></p>
+</div><h4 id='method.set_baud_rate' class="method"><span id='set_baud_rate.v' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.set_baud_rate' class='fnname'>set_baud_rate</a>(&amp;mut self, baud_rate: <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a>) -&gt; <a class="type" href="../serial_core/type.Result.html" title="type serial_core::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">()</a>&gt;</code></span></h4>
+<div class='docblock'><p>Sets the baud rate. <a href="../serial_core/trait.SerialPortSettings.html#tymethod.set_baud_rate">Read more</a></p>
+</div><h4 id='method.set_char_size' class="method"><span id='set_char_size.v' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.set_char_size' class='fnname'>set_char_size</a>(&amp;mut self, char_size: <a class="enum" href="../serial_core/enum.CharSize.html" title="enum serial_core::CharSize">CharSize</a>)</code></span></h4>
+<div class='docblock'><p>Sets the character size.</p>
+</div><h4 id='method.set_parity' class="method"><span id='set_parity.v' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.set_parity' class='fnname'>set_parity</a>(&amp;mut self, parity: <a class="enum" href="../serial_core/enum.Parity.html" title="enum serial_core::Parity">Parity</a>)</code></span></h4>
+<div class='docblock'><p>Sets the parity-checking mode.</p>
+</div><h4 id='method.set_stop_bits' class="method"><span id='set_stop_bits.v' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.set_stop_bits' class='fnname'>set_stop_bits</a>(&amp;mut self, stop_bits: <a class="enum" href="../serial_core/enum.StopBits.html" title="enum serial_core::StopBits">StopBits</a>)</code></span></h4>
+<div class='docblock'><p>Sets the number of stop bits.</p>
+</div><h4 id='method.set_flow_control' class="method"><span id='set_flow_control.v' class='invisible'><code>fn <a href='../serial_core/trait.SerialPortSettings.html#tymethod.set_flow_control' class='fnname'>set_flow_control</a>(&amp;mut self, flow_control: <a class="enum" href="../serial_core/enum.FlowControl.html" title="enum serial_core::FlowControl">FlowControl</a>)</code></span></h4>
+<div class='docblock'><p>Sets the flow control mode.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "serial_core";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>

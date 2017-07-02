@@ -9,13 +9,15 @@
 
     <title>serial::open - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc fn">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -41,13 +43,13 @@
         </form>
     </nav>
 
-    <section id='main' class="content fn">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>serial</a>::<wbr><a class='fn' href=''>open</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-378' class='srclink' href='../src/serial/src/lib.rs.html#151-154' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn open&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html' title='core::convert::AsRef'>AsRef</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html' title='std::ffi::os_str::OsStr'>OsStr</a>&gt; + ?<a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a>&gt;(port: &amp;T) -&gt; <a class='type' href='../serial/type.Result.html' title='serial::Result'>Result</a>&lt;<a class='type' href='../serial/type.SystemPort.html' title='serial::SystemPort'>SystemPort</a>&gt;</pre><div class='docblock'><p>A convenience function for opening a native serial port.</p>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>serial</a>::<wbr><a class="fn" href=''>open</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/serial/lib.rs.html#104-106' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn open&lt;T:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.AsRef.html" title="trait core::convert::AsRef">AsRef</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/std/ffi/os_str/struct.OsStr.html" title="struct std::ffi::os_str::OsStr">OsStr</a>&gt; + ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>&gt;(port: &amp;T) -&gt; <a class="type" href="../serial_core/type.Result.html" title="type serial_core::Result">Result</a>&lt;<a class="type" href="../serial/type.SystemPort.html" title="type serial::SystemPort">SystemPort</a>&gt;</pre><div class='docblock'><p>A convenience function for opening a native serial port.</p>
 
 <p>The argument must be one that&#39;s understood by the target operating system to identify a serial
 port. On Unix systems, it should be a path to a TTY device file. On Windows, it should be the
@@ -66,17 +68,17 @@ already in use.</li>
 <h2 id='examples' class='section-header'><a href='#examples'>Examples</a></h2>
 <p>Provide a system-specific string that identifies a serial port:</p>
 
-<pre class='rust rust-example-rendered'>
-<span class='kw'>let</span> <span class='ident'>port</span> <span class='op'>=</span> <span class='ident'>serial</span>::<span class='ident'>open</span>(<span class='string'>&quot;/dev/ttyUSB0&quot;</span>).<span class='ident'>unwrap</span>();</pre>
+<pre class="rust rust-example-rendered">
+<span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">serial</span>::<span class="ident">open</span>(<span class="string">&quot;COM1&quot;</span>).<span class="ident">unwrap</span>();</pre>
 
 <p>Hard-coding the device name dimishes the cross-platform utility of <code>serial::open()</code>. To
 preserve cross-platform functionality, device names should come from external sources:</p>
 
-<pre class='rust rust-example-rendered'>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>env</span>;
+<pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>;
 
-<span class='kw'>for</span> <span class='ident'>arg</span> <span class='kw'>in</span> <span class='ident'>env</span>::<span class='ident'>args_os</span>().<span class='ident'>skip</span>(<span class='number'>1</span>) {
-    <span class='kw'>let</span> <span class='ident'>port</span> <span class='op'>=</span> <span class='ident'>serial</span>::<span class='ident'>open</span>(<span class='kw-2'>&amp;</span><span class='ident'>arg</span>).<span class='ident'>unwrap</span>();
+<span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">env</span>::<span class="ident">args_os</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
+    <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">serial</span>::<span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>).<span class="ident">unwrap</span>();
 }</pre>
 </div></section>
     <section id='search' class="content hidden"></section>
@@ -101,6 +103,8 @@ preserve cross-platform functionality, device names should come from external so
                     <dd>Move down in search results</dd>
                     <dt>&#9166;</dt>
                     <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
                 </dl>
             </div>
 
@@ -132,11 +136,8 @@ preserve cross-platform functionality, device names should come from external so
     <script>
         window.rootPath = "../";
         window.currentCrate = "serial";
-        window.playgroundUrl = "";
     </script>
-    <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

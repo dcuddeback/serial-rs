@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["COMPort","A serial port implementation for Windows COM ports."],["COMSettings","Serial port settings for COM ports."]]});

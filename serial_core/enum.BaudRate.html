@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `BaudRate` enum in crate `serial_core`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, BaudRate">
+
+    <title>serial_core::BaudRate - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc enum">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Enum BaudRate</p><div class="block items"><ul><li><a href="#variants">Variants</a></li><li><a href="#methods">Methods</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='index.html'>serial_core</a></p><script>window.sidebarCurrent = {name: 'BaudRate', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Enum <a href='index.html'>serial_core</a>::<wbr><a class="enum" href=''>BaudRate</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../src/serial_core/lib.rs.html#109-154' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum BaudRate {
+    Baud110,
+    Baud300,
+    Baud600,
+    Baud1200,
+    Baud2400,
+    Baud4800,
+    Baud9600,
+    Baud19200,
+    Baud38400,
+    Baud57600,
+    Baud115200,
+    BaudOther(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>),
+}</pre><div class='docblock'><p>Serial port baud rates.</p>
+
+<h2 id='portability' class='section-header'><a href='#portability'>Portability</a></h2>
+<p>The <code>BaudRate</code> variants with numeric suffixes, e.g., <code>Baud9600</code>, indicate standard baud rates
+that are widely-supported on many systems. While non-standard baud rates can be set with
+<code>BaudOther</code>, their behavior is system-dependent. Some systems may not support arbitrary baud
+rates. Using the standard baud rates is more likely to result in portable applications.</p>
+</div><h2 id='variants' class='variants'>Variants</h2>
+<span id='variant.Baud110' class='variant'><span id='Baud110.v' class='invisible'><code>Baud110</code></span></span><div class='docblock'><p>110 baud.</p>
+</div><span id='variant.Baud300' class='variant'><span id='Baud300.v' class='invisible'><code>Baud300</code></span></span><div class='docblock'><p>300 baud.</p>
+</div><span id='variant.Baud600' class='variant'><span id='Baud600.v' class='invisible'><code>Baud600</code></span></span><div class='docblock'><p>600 baud.</p>
+</div><span id='variant.Baud1200' class='variant'><span id='Baud1200.v' class='invisible'><code>Baud1200</code></span></span><div class='docblock'><p>1200 baud.</p>
+</div><span id='variant.Baud2400' class='variant'><span id='Baud2400.v' class='invisible'><code>Baud2400</code></span></span><div class='docblock'><p>2400 baud.</p>
+</div><span id='variant.Baud4800' class='variant'><span id='Baud4800.v' class='invisible'><code>Baud4800</code></span></span><div class='docblock'><p>4800 baud.</p>
+</div><span id='variant.Baud9600' class='variant'><span id='Baud9600.v' class='invisible'><code>Baud9600</code></span></span><div class='docblock'><p>9600 baud.</p>
+</div><span id='variant.Baud19200' class='variant'><span id='Baud19200.v' class='invisible'><code>Baud19200</code></span></span><div class='docblock'><p>19,200 baud.</p>
+</div><span id='variant.Baud38400' class='variant'><span id='Baud38400.v' class='invisible'><code>Baud38400</code></span></span><div class='docblock'><p>38,400 baud.</p>
+</div><span id='variant.Baud57600' class='variant'><span id='Baud57600.v' class='invisible'><code>Baud57600</code></span></span><div class='docblock'><p>57,600 baud.</p>
+</div><span id='variant.Baud115200' class='variant'><span id='Baud115200.v' class='invisible'><code>Baud115200</code></span></span><div class='docblock'><p>115,200 baud.</p>
+</div><span id='variant.BaudOther' class='variant'><span id='BaudOther.v' class='invisible'><code>BaudOther(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code></span></span><div class='docblock'><p>Non-standard baud rates.</p>
+
+<p><code>BaudOther</code> can be used to set non-standard baud rates by setting its member to be the
+desired baud rate.</p>
+
+<pre class="rust rust-example-rendered">
+<span class="ident">serial_core</span>::<span class="ident">BaudOther</span>(<span class="number">4_000_000</span>); <span class="comment">// 4,000,000 baud</span></pre>
+
+<p>Non-standard baud rates may not be supported on all systems.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#156-213' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.from_speed' class="method"><span id='from_speed.v' class='invisible'><code>fn <a href='#method.from_speed' class='fnname'>from_speed</a>(speed: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span></h4>
+<div class='docblock'><p>Creates a <code>BaudRate</code> for a particular speed.</p>
+
+<p>This function can be used to select a <code>BaudRate</code> variant from an integer containing the
+desired baud rate.</p>
+
+<h2 id='example' class='section-header'><a href='#example'>Example</a></h2>
+<pre class="rust rust-example-rendered">
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">BaudRate</span>::<span class="ident">Baud9600</span>, <span class="ident">BaudRate</span>::<span class="ident">from_speed</span>(<span class="number">9600</span>));
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">BaudRate</span>::<span class="ident">Baud115200</span>, <span class="ident">BaudRate</span>::<span class="ident">from_speed</span>(<span class="number">115200</span>));
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">BaudRate</span>::<span class="ident">BaudOther</span>(<span class="number">4000000</span>), <span class="ident">BaudRate</span>::<span class="ident">from_speed</span>(<span class="number">4000000</span>));</pre>
+</div><h4 id='method.speed' class="method"><span id='speed.v' class='invisible'><code>fn <a href='#method.speed' class='fnname'>speed</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span></h4>
+<div class='docblock'><p>Returns the baud rate as an integer.</p>
+
+<h2 id='example-1' class='section-header'><a href='#example-1'>Example</a></h2>
+<pre class="rust rust-example-rendered">
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">9600</span>, <span class="ident">BaudRate</span>::<span class="ident">Baud9600</span>.<span class="ident">speed</span>());
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">115200</span>, <span class="ident">BaudRate</span>::<span class="ident">Baud115200</span>.<span class="ident">speed</span>());
+<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">4000000</span>, <span class="ident">BaudRate</span>::<span class="ident">BaudOther</span>(<span class="number">4000000</span>).<span class="ident">speed</span>());</pre>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#108' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#108' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#108' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#108' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="enum" href="../serial_core/enum.BaudRate.html" title="enum serial_core::BaudRate">BaudRate</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/serial_core/lib.rs.html#108' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "serial_core";
+    </script>
+    <script src="../main.js"></script>
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
