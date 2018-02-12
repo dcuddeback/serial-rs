@@ -25,7 +25,7 @@ serial = "0.4"
 ```
 
 Import the `serial` crate and everything from the `serial::prelude` module. The traits in the
-`serial::prelude` module are are useful to have in scope when working with serial ports, and they
+`serial::prelude` module are useful to have in scope when working with serial ports, and they
 are unlikely to conflict with other crates.
 
 To open a serial port, call `serial::open()` with any type that's convertable to `OsStr`.  With an
