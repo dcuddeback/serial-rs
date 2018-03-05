@@ -10,6 +10,7 @@ use std::time::Duration;
 use std::os::windows::prelude::*;
 
 use core::{SerialDevice, SerialPortSettings};
+use core::GetReadableBytesCount;
 
 use libc::c_void;
 use ffi::*;
@@ -131,6 +132,17 @@ impl io::Write for COMPort {
         match unsafe { FlushFileBuffers(self.handle) } {
             0 => Err(io::Error::last_os_error()),
             _ => Ok(()),
+        }
+    }
+}
+
+impl GetReadableBytesCount for COMPort {
+    fn get_readable_bytes_count(&mut self) -> core::Result<usize> {
+        let mut errors: DWORD = 0;
+        let mut comstat: COMSTAT = unsafe { mem::zeroed() };
+        match unsafe { ClearCommError(self.handle, &mut errors, &mut comstat) } {
+            0 => Err(error::last_os_error()),
+            _ => Ok(comstat.cbInQue as usize)
         }
     }
 }

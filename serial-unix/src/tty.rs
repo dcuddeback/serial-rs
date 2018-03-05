@@ -13,6 +13,7 @@ use std::os::unix::prelude::*;
 use libc::{c_int, c_void, size_t};
 
 use core::{SerialDevice, SerialPortSettings};
+use core::GetReadableBytesCount;
 
 
 #[cfg(target_os = "linux")]
@@ -159,6 +160,16 @@ impl io::Write for TTYPort {
 
     fn flush(&mut self) -> io::Result<()> {
         termios::tcdrain(self.fd)
+    }
+}
+
+impl GetReadableBytesCount for TTYPort {
+    fn get_readable_bytes_count(&mut self) -> core::Result<usize> {
+        let mut count: c_int = 0;
+        match unsafe { ioctl::ioctl(self.fd, ioctl::FIONREAD, &mut count) } {
+            0 => Ok(count as usize),
+            _ => Err(super::error::last_os_error())
+        }
     }
 }
 
