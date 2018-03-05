@@ -289,11 +289,16 @@ pub trait GetReadableBytesCount {
     /// ## Example
     ///
     /// ```no_run
-    /// const BUF_LEN: usize = 100;
-    /// let mut buf = [0u8; BUF_LEN];
-    /// let readable = port.get_readable_bytes_count().unwrap();
-    /// if readable > 0 {
-    ///     let len = port.read(&mut buf[0..std::cmp::min(readable, BUF_LEN)]).unwrap();
+    /// use serial_core::prelude::*;
+    ///
+    /// fn read_received_bytes<T: SerialPort>(port: &mut T) -> serial_core::Result<()> {
+    ///     const BUF_LEN: usize = 100;
+    ///     let mut buf = [0u8; BUF_LEN];
+    ///     let readable = port.get_readable_bytes_count().unwrap();
+    ///     if readable > 0 {
+    ///         let len = port.read(&mut buf[0..std::cmp::min(readable, BUF_LEN)]).unwrap();
+    ///     }
+    ///     Ok(())
     /// }
     /// ```
     fn get_readable_bytes_count(&mut self) -> ::Result<usize>;
