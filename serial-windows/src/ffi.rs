@@ -143,6 +143,15 @@ pub struct COMMTIMEOUTS {
     pub WriteTotalTimeoutConstant: DWORD,
 }
 
+#[repr(C)]
+pub struct COMSTAT {
+    pub fFlags: DWORD,
+    pub cbInQue: DWORD,
+    pub cbOutQue: DWORD,
+}
+pub type LPCOMSTAT = *mut COMSTAT;
+
+
 extern "system" {
     pub fn CreateFileW(lpFileName: LPCWSTR,
                        dwDesiredAccess: DWORD,
@@ -173,6 +182,7 @@ extern "system" {
     pub fn SetCommTimeouts(hFile: HANDLE, lpCommTimeouts: *const COMMTIMEOUTS) -> BOOL;
     pub fn EscapeCommFunction(hFile: HANDLE, dwFunc: DWORD) -> BOOL;
     pub fn GetCommModemStatus(hFile: HANDLE, lpModemStat: *mut DWORD) -> BOOL;
+    pub fn ClearCommError(hFile: HANDLE, lpErrors: *mut DWORD, lpStat: LPCOMSTAT) -> BOOL;
 
     pub fn GetLastError() -> DWORD;
 }
