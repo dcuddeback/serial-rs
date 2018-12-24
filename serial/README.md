@@ -59,7 +59,7 @@ fn interact<T: SerialPort>(port: &mut T) -> io::Result<()> {
         Ok(())
     }));
 
-    try!(port.set_timeout(Duration::from_millis(1000)));
+    try!(port.set_timeout(Some(Duration::from_millis(1000))));
 
     let mut buf: Vec<u8> = (0..255).collect();
 

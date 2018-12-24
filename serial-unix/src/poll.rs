@@ -29,15 +29,15 @@ const POLLERR:  c_short = 0x0008;
 const POLLHUP:  c_short = 0x0010;
 const POLLNVAL: c_short = 0x0020;
 
-pub fn wait_read_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
+pub fn wait_read_fd(fd: c_int, timeout: Option<Duration>) -> io::Result<()> {
     wait_fd(fd, POLLIN, timeout)
 }
 
-pub fn wait_write_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
+pub fn wait_write_fd(fd: c_int, timeout: Option<Duration>) -> io::Result<()> {
     wait_fd(fd, POLLOUT, timeout)
 }
 
-fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
+fn wait_fd(fd: c_int, events: c_short, timeout: Option<Duration>) -> io::Result<()> {
     use libc::{EINTR, EPIPE, EIO};
 
     let mut fds = vec!(pollfd { fd: fd, events: events, revents: 0 });
@@ -72,7 +72,7 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
 
 #[cfg(target_os = "linux")]
 #[inline]
-fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
+fn do_poll(fds: &mut Vec<pollfd>, timeout: Option<Duration>) -> c_int {
     use std::ptr;
 
     use libc::c_void;
@@ -86,31 +86,44 @@ fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
         fn ppoll(fds: *mut pollfd, nfds: nfds_t, timeout_ts: *mut libc::timespec, sigmask: *const sigset_t) -> c_int;
     }
 
-    let mut timeout_ts = libc::timespec {
-        tv_sec: timeout.as_secs() as libc::time_t,
-        tv_nsec: timeout.subsec_nanos() as libc::c_long,
-    };
+    if let Some(timeout) = timeout {
+        let mut timeout_ts = libc::timespec {
+            tv_sec: timeout.as_secs() as libc::time_t,
+            tv_nsec: timeout.subsec_nanos() as libc::c_long,
+        };
 
-    unsafe {
-        ppoll((&mut fds[..]).as_mut_ptr(),
-              fds.len() as nfds_t,
-              &mut timeout_ts,
-              ptr::null())
+        unsafe {
+            ppoll((&mut fds[..]).as_mut_ptr(),
+                  fds.len() as nfds_t,
+                  &mut timeout_ts,
+                  ptr::null())
+        }
+    } else {
+        unsafe {
+            ppoll((&mut fds[..]).as_mut_ptr(),
+                  fds.len() as nfds_t,
+                  ptr::null_mut(),
+                  ptr::null())
+        }
     }
 }
 
 #[cfg(not(target_os = "linux"))]
 #[inline]
-fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
+fn do_poll(fds: &mut Vec<pollfd>, timeout: Option<Duration>) -> c_int {
     extern "C" {
         fn poll(fds: *mut pollfd, nfds: nfds_t, timeout: c_int) -> c_int;
     }
 
-    let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
+    let milliseconds = if let Some(timeout) = timeout {
+        (timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000) as c_int
+    } else {
+        -1
+    };
 
     unsafe {
         poll((&mut fds[..]).as_mut_ptr(),
              fds.len() as nfds_t,
-             milliseconds as c_int)
+             milliseconds)
     }
 }

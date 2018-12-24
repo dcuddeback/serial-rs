@@ -52,7 +52,7 @@ fn probe<P: SerialPort>(port: &mut P) -> io::Result<()> {
     }));
 
     // I/O
-    try!(port.set_timeout(Duration::from_millis(100)));
+    try!(port.set_timeout(Some(Duration::from_millis(100))));
     try!(port.write(&buf[..]));
     try!(port.read(&mut buf[..]));
 
@@ -174,8 +174,8 @@ impl serial::SerialDevice for CustomSerialPort {
 
     fn read_settings(&self) -> serial::Result<Self::Settings> { ... }
     fn write_settings(&mut self, settings: &Self::Settings) -> serial::Result<()> { ... }
-    fn timeout(&self) -> Duration { ... }
-    fn set_timeout(&mut self, timeout: Duration) -> serial::Result<()> { ... }
+    fn timeout(&self) -> Option<Duration> { ... }
+    fn set_timeout(&mut self, timeout: Option<Duration>) -> serial::Result<()> { ... }
 
     fn set_rts(&mut self, level: bool) -> serial::Result<()> { ... }
     fn set_dtr(&mut self, level: bool) -> serial::Result<()> { ... }
