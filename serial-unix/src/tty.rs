@@ -30,7 +30,7 @@ const O_NOCTTY: c_int = 0;
 /// The port will be closed when the value is dropped.
 pub struct TTYPort {
     fd: RawFd,
-    timeout: Duration,
+    timeout: Option<Duration>,
 }
 
 impl TTYPort {
@@ -65,7 +65,7 @@ impl TTYPort {
 
         let mut port = TTYPort {
             fd: fd,
-            timeout: Duration::from_millis(100),
+            timeout: None,
         };
 
         // get exclusive access to device
@@ -205,11 +205,11 @@ impl SerialDevice for TTYPort {
         Ok(())
     }
 
-    fn timeout(&self) -> Duration {
+    fn timeout(&self) -> Option<Duration> {
         self.timeout
     }
 
-    fn set_timeout(&mut self, timeout: Duration) -> core::Result<()> {
+    fn set_timeout(&mut self, timeout: Option<Duration>) -> core::Result<()> {
         self.timeout = timeout;
         Ok(())
     }

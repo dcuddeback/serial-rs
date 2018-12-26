@@ -19,7 +19,7 @@ use ffi::*;
 /// The port will be closed when the value is dropped.
 pub struct COMPort {
     handle: HANDLE,
-    timeout: Duration,
+    timeout: Option<Duration>,
 }
 
 unsafe impl Send for COMPort {}
@@ -50,15 +50,13 @@ impl COMPort {
             CreateFileW(name.as_ptr(), GENERIC_READ | GENERIC_WRITE, 0, ptr::null_mut(), OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 as HANDLE)
         };
 
-        let timeout = Duration::from_millis(100);
-
         if handle != INVALID_HANDLE_VALUE {
             let mut port = COMPort {
                 handle: handle,
-                timeout: timeout,
+                timeout: None,
             };
 
-            try!(port.set_timeout(timeout));
+            try!(port.set_timeout(None));
             Ok(port)
         }
         else {
@@ -160,23 +158,29 @@ impl SerialDevice for COMPort {
         }
     }
 
-    fn timeout(&self) -> Duration {
+    fn timeout(&self) -> Option<Duration> {
         self.timeout
     }
 
-    fn set_timeout(&mut self, timeout: Duration) -> core::Result<()> {
-        let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
+    fn set_timeout(&mut self, timeout: Option<Duration>) -> core::Result<()> {
+        if let Some(timeout) = timeout {
+            let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
 
-        let timeouts = COMMTIMEOUTS {
-            ReadIntervalTimeout: 0,
-            ReadTotalTimeoutMultiplier: 0,
-            ReadTotalTimeoutConstant: milliseconds as DWORD,
-            WriteTotalTimeoutMultiplier: 0,
-            WriteTotalTimeoutConstant: 0,
-        };
+            let timeouts = COMMTIMEOUTS {
+                ReadIntervalTimeout: 0,
+                ReadTotalTimeoutMultiplier: 0,
+                ReadTotalTimeoutConstant: milliseconds as DWORD,
+                WriteTotalTimeoutMultiplier: 0,
+                WriteTotalTimeoutConstant: 0,
+            };
 
-        if unsafe { SetCommTimeouts(self.handle, &timeouts) } == 0 {
-            return Err(error::last_os_error());
+            if unsafe { SetCommTimeouts(self.handle, &timeouts) } == 0 {
+                return Err(error::last_os_error());
+            }
+        } else {
+            if unsafe { SetCommTimeouts(self.handle, ptr::null()) } == 0 {
+                return Err(error::last_os_error());
+            }
         }
 
         self.timeout = timeout;

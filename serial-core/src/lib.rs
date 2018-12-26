@@ -341,10 +341,10 @@ pub trait SerialDevice: io::Read + io::Write {
     fn write_settings(&mut self, settings: &Self::Settings) -> ::Result<()>;
 
     /// Returns the current timeout.
-    fn timeout(&self) -> Duration;
+    fn timeout(&self) -> Option<Duration>;
 
     /// Sets the timeout for future I/O operations.
-    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()>;
+    fn set_timeout(&mut self, timeout: Option<Duration>) -> ::Result<()>;
 
     /// Sets the state of the RTS (Request To Send) control signal.
     ///
@@ -437,10 +437,10 @@ pub trait SerialDevice: io::Read + io::Write {
 /// The serial port will be closed when the value is dropped.
 pub trait SerialPort: io::Read + io::Write {
     /// Returns the current timeout.
-    fn timeout(&self) -> Duration;
+    fn timeout(&self) -> Option<Duration>;
 
     /// Sets the timeout for future I/O operations.
-    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()>;
+    fn set_timeout(&mut self, timeout: Option<Duration>) -> ::Result<()>;
 
     /// Configures a serial port device.
     ///
@@ -576,11 +576,11 @@ pub trait SerialPort: io::Read + io::Write {
 impl<T> SerialPort for T
     where T: SerialDevice
 {
-    fn timeout(&self) -> Duration {
+    fn timeout(&self) -> Option<Duration> {
         T::timeout(self)
     }
 
-    fn set_timeout(&mut self, timeout: Duration) -> ::Result<()> {
+    fn set_timeout(&mut self, timeout: Option<Duration>) -> ::Result<()> {
         T::set_timeout(self, timeout)
     }
 
