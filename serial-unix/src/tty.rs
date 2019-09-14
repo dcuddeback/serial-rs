@@ -146,7 +146,7 @@ impl io::Read for TTYPort {
     }
 }
 
-impl io::Read for &TTYPort {
+impl<'a> io::Read for &'a TTYPort {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         self.read_impl(buf)
     }
@@ -162,7 +162,7 @@ impl io::Write for TTYPort {
     }
 }
 
-impl io::Write for &TTYPort {
+impl<'a> io::Write for &'a TTYPort {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         self.write_impl(buf)
     }
