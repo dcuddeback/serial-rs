@@ -104,6 +104,74 @@ impl TTYPort {
     }
 }
 
+// Implement functions for io::Read and io::Write
+// This is nessessery to implement for `&TTYPort` type.
+impl TTYPort {
+    // used by io::Read for Self and &Self.
+    #[inline]
+    fn read_impl(&self, buf: &mut [u8]) -> io::Result<usize> {
+        try!(super::poll::wait_read_fd(self.fd, self.timeout));
+
+        let len = unsafe { libc::read(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t) };
+
+        if len >= 0 {
+            Ok(len as usize)
+        } else {
+            Err(io::Error::last_os_error())
+        }
+    }
+
+    #[inline]
+    fn write_impl(&self, buf: &[u8]) -> io::Result<usize> {
+        try!(super::poll::wait_write_fd(self.fd, self.timeout));
+
+        let len = unsafe { libc::write(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t) };
+
+        if len >= 0 {
+            Ok(len as usize)
+        } else {
+            Err(io::Error::last_os_error())
+        }
+    }
+
+    #[inline]
+    fn flush_impl(&self) -> io::Result<()> {
+        termios::tcdrain(self.fd)
+    }
+}
+
+impl io::Read for TTYPort {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.read_impl(buf)
+    }
+}
+
+impl io::Read for &TTYPort {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.read_impl(buf)
+    }
+}
+
+impl io::Write for TTYPort {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.write_impl(buf)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.flush_impl()
+    }
+}
+
+impl io::Write for &TTYPort {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.write_impl(buf)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.flush_impl()
+    }
+}
+
 impl Drop for TTYPort {
     fn drop(&mut self) {
         #![allow(unused_must_use)]
@@ -118,38 +186,6 @@ impl Drop for TTYPort {
 impl AsRawFd for TTYPort {
     fn as_raw_fd(&self) -> RawFd {
         self.fd
-    }
-}
-
-impl io::Read for TTYPort {
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        try!(super::poll::wait_read_fd(self.fd, self.timeout));
-
-        let len = unsafe { libc::read(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t) };
-
-        if len >= 0 {
-            Ok(len as usize)
-        } else {
-            Err(io::Error::last_os_error())
-        }
-    }
-}
-
-impl io::Write for TTYPort {
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        try!(super::poll::wait_write_fd(self.fd, self.timeout));
-
-        let len = unsafe { libc::write(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t) };
-
-        if len >= 0 {
-            Ok(len as usize)
-        } else {
-            Err(io::Error::last_os_error())
-        }
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        termios::tcdrain(self.fd)
     }
 }
 
