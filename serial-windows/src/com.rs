@@ -11,8 +11,8 @@ use std::os::windows::prelude::*;
 
 use core::{SerialDevice, SerialPortSettings};
 
-use libc::c_void;
 use ffi::*;
+use libc::c_void;
 
 /// A serial port implementation for Windows COM ports.
 ///
@@ -47,7 +47,15 @@ impl COMPort {
         name.push(0);
 
         let handle = unsafe {
-            CreateFileW(name.as_ptr(), GENERIC_READ | GENERIC_WRITE, 0, ptr::null_mut(), OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 as HANDLE)
+            CreateFileW(
+                name.as_ptr(),
+                GENERIC_READ | GENERIC_WRITE,
+                0,
+                ptr::null_mut(),
+                OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL,
+                0 as HANDLE,
+            )
         };
 
         let timeout = Duration::from_millis(100);
@@ -60,8 +68,7 @@ impl COMPort {
 
             try!(port.set_timeout(timeout));
             Ok(port)
-        }
-        else {
+        } else {
             Err(error::last_os_error())
         }
     }
@@ -93,9 +100,7 @@ impl Drop for COMPort {
 
 impl AsRawHandle for COMPort {
     fn as_raw_handle(&self) -> RawHandle {
-        unsafe {
-            mem::transmute(self.handle)
-        }
+        unsafe { mem::transmute(self.handle) }
     }
 }
 
@@ -103,14 +108,24 @@ impl io::Read for COMPort {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         let mut len: DWORD = 0;
 
-        match unsafe { ReadFile(self.handle, buf.as_mut_ptr() as *mut c_void, buf.len() as DWORD, &mut len, ptr::null_mut()) } {
+        match unsafe {
+            ReadFile(
+                self.handle,
+                buf.as_mut_ptr() as *mut c_void,
+                buf.len() as DWORD,
+                &mut len,
+                ptr::null_mut(),
+            )
+        } {
             0 => Err(io::Error::last_os_error()),
             _ => {
                 if len != 0 {
                     Ok(len as usize)
-                }
-                else {
-                    Err(io::Error::new(io::ErrorKind::TimedOut, "Operation timed out"))
+                } else {
+                    Err(io::Error::new(
+                        io::ErrorKind::TimedOut,
+                        "Operation timed out",
+                    ))
                 }
             }
         }
@@ -121,7 +136,15 @@ impl io::Write for COMPort {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         let mut len: DWORD = 0;
 
-        match unsafe { WriteFile(self.handle, buf.as_ptr() as *mut c_void, buf.len() as DWORD, &mut len, ptr::null_mut()) } {
+        match unsafe {
+            WriteFile(
+                self.handle,
+                buf.as_ptr() as *mut c_void,
+                buf.len() as DWORD,
+                &mut len,
+                ptr::null_mut(),
+            )
+        } {
             0 => Err(io::Error::last_os_error()),
             _ => Ok(len as usize),
         }
@@ -149,7 +172,6 @@ impl SerialDevice for COMPort {
 
                 Ok(COMSettings { inner: dcb })
             }
-
         }
     }
 
@@ -186,8 +208,7 @@ impl SerialDevice for COMPort {
     fn set_rts(&mut self, level: bool) -> core::Result<()> {
         if level {
             self.escape_comm_function(SETRTS)
-        }
-        else {
+        } else {
             self.escape_comm_function(CLRRTS)
         }
     }
@@ -195,8 +216,7 @@ impl SerialDevice for COMPort {
     fn set_dtr(&mut self, level: bool) -> core::Result<()> {
         if level {
             self.escape_comm_function(SETDTR)
-        }
-        else {
+        } else {
             self.escape_comm_function(CLRDTR)
         }
     }
@@ -218,9 +238,8 @@ impl SerialDevice for COMPort {
     }
 }
 
-
 /// Serial port settings for COM ports.
-#[derive(Copy,Clone,Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct COMSettings {
     inner: DCB,
 }
@@ -228,22 +247,22 @@ pub struct COMSettings {
 impl SerialPortSettings for COMSettings {
     fn baud_rate(&self) -> Option<core::BaudRate> {
         match self.inner.BaudRate {
-            CBR_110    => Some(core::Baud110),
-            CBR_300    => Some(core::Baud300),
-            CBR_600    => Some(core::Baud600),
-            CBR_1200   => Some(core::Baud1200),
-            CBR_2400   => Some(core::Baud2400),
-            CBR_4800   => Some(core::Baud4800),
-            CBR_9600   => Some(core::Baud9600),
-            CBR_14400  => Some(core::BaudOther(14400)),
-            CBR_19200  => Some(core::Baud19200),
-            CBR_38400  => Some(core::Baud38400),
-            CBR_56000  => Some(core::BaudOther(56000)),
-            CBR_57600  => Some(core::Baud57600),
+            CBR_110 => Some(core::Baud110),
+            CBR_300 => Some(core::Baud300),
+            CBR_600 => Some(core::Baud600),
+            CBR_1200 => Some(core::Baud1200),
+            CBR_2400 => Some(core::Baud2400),
+            CBR_4800 => Some(core::Baud4800),
+            CBR_9600 => Some(core::Baud9600),
+            CBR_14400 => Some(core::BaudOther(14400)),
+            CBR_19200 => Some(core::Baud19200),
+            CBR_38400 => Some(core::Baud38400),
+            CBR_56000 => Some(core::BaudOther(56000)),
+            CBR_57600 => Some(core::Baud57600),
             CBR_115200 => Some(core::Baud115200),
             CBR_128000 => Some(core::BaudOther(128000)),
             CBR_256000 => Some(core::BaudOther(256000)),
-            n          => Some(core::BaudOther(n as usize)),
+            n => Some(core::BaudOther(n as usize)),
         }
     }
 
@@ -259,46 +278,44 @@ impl SerialPortSettings for COMSettings {
 
     fn parity(&self) -> Option<core::Parity> {
         match self.inner.Parity {
-            ODDPARITY  => Some(core::ParityOdd),
+            ODDPARITY => Some(core::ParityOdd),
             EVENPARITY => Some(core::ParityEven),
-            NOPARITY   => Some(core::ParityNone),
-            _          => None,
+            NOPARITY => Some(core::ParityNone),
+            _ => None,
         }
     }
 
     fn stop_bits(&self) -> Option<core::StopBits> {
         match self.inner.StopBits {
             TWOSTOPBITS => Some(core::Stop2),
-            ONESTOPBIT  => Some(core::Stop1),
-            _           => None,
+            ONESTOPBIT => Some(core::Stop1),
+            _ => None,
         }
     }
 
     fn flow_control(&self) -> Option<core::FlowControl> {
         if self.inner.fBits & (fOutxCtsFlow | fRtsControl) != 0 {
             Some(core::FlowHardware)
-        }
-        else if self.inner.fBits & (fOutX | fInX) != 0 {
+        } else if self.inner.fBits & (fOutX | fInX) != 0 {
             Some(core::FlowSoftware)
-        }
-        else {
+        } else {
             Some(core::FlowNone)
         }
     }
 
     fn set_baud_rate(&mut self, baud_rate: core::BaudRate) -> core::Result<()> {
         self.inner.BaudRate = match baud_rate {
-            core::Baud110      => CBR_110,
-            core::Baud300      => CBR_300,
-            core::Baud600      => CBR_600,
-            core::Baud1200     => CBR_1200,
-            core::Baud2400     => CBR_2400,
-            core::Baud4800     => CBR_4800,
-            core::Baud9600     => CBR_9600,
-            core::Baud19200    => CBR_19200,
-            core::Baud38400    => CBR_38400,
-            core::Baud57600    => CBR_57600,
-            core::Baud115200   => CBR_115200,
+            core::Baud110 => CBR_110,
+            core::Baud300 => CBR_300,
+            core::Baud600 => CBR_600,
+            core::Baud1200 => CBR_1200,
+            core::Baud2400 => CBR_2400,
+            core::Baud4800 => CBR_4800,
+            core::Baud9600 => CBR_9600,
+            core::Baud19200 => CBR_19200,
+            core::Baud38400 => CBR_38400,
+            core::Baud57600 => CBR_57600,
+            core::Baud115200 => CBR_115200,
             core::BaudOther(n) => n as DWORD,
         };
 
@@ -317,14 +334,13 @@ impl SerialPortSettings for COMSettings {
     fn set_parity(&mut self, parity: core::Parity) {
         self.inner.Parity = match parity {
             core::ParityNone => NOPARITY,
-            core::ParityOdd  => ODDPARITY,
+            core::ParityOdd => ODDPARITY,
             core::ParityEven => EVENPARITY,
         };
 
         if parity == core::ParityNone {
             self.inner.fBits &= !fParity;
-        }
-        else {
+        } else {
             self.inner.fBits |= fParity;
         }
     }
