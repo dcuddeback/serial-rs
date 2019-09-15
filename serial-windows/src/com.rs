@@ -104,8 +104,8 @@ impl AsRawHandle for COMPort {
     }
 }
 
-impl io::Read for COMPort {
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+impl COMPort {
+    fn read_impl(&self, buf: &mut [u8]) -> io::Result<usize> {
         let mut len: DWORD = 0;
 
         match unsafe {
@@ -130,10 +130,8 @@ impl io::Read for COMPort {
             }
         }
     }
-}
 
-impl io::Write for COMPort {
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+    fn write_impl(&self, buf: &[u8]) -> io::Result<usize> {
         let mut len: DWORD = 0;
 
         match unsafe {
@@ -150,11 +148,43 @@ impl io::Write for COMPort {
         }
     }
 
-    fn flush(&mut self) -> io::Result<()> {
+    fn flush_impl(&self) -> io::Result<()> {
         match unsafe { FlushFileBuffers(self.handle) } {
             0 => Err(io::Error::last_os_error()),
             _ => Ok(()),
         }
+    }
+}
+
+impl io::Read for COMPort {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.read_impl()
+    }
+}
+
+impl io::Read for &COMPort {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        self.read_impl()
+    }
+}
+
+impl io::Write for COMPort {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.write_impl()
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.flush_impl()
+    }
+}
+
+impl io::Write for &COMPort {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.write_impl()
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.flush_impl()
     }
 }
 
