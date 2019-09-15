@@ -162,15 +162,15 @@ impl io::Read for COMPort {
     }
 }
 
-impl io::Read for &COMPort {
+impl<'a> io::Read for &'a COMPort {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        self.read_impl()
+        self.read_impl(buf)
     }
 }
 
 impl io::Write for COMPort {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        self.write_impl()
+        self.write_impl(buf)
     }
 
     fn flush(&mut self) -> io::Result<()> {
@@ -178,9 +178,9 @@ impl io::Write for COMPort {
     }
 }
 
-impl io::Write for &COMPort {
+impl<'a> io::Write for &'a COMPort {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        self.write_impl()
+        self.write_impl(buf)
     }
 
     fn flush(&mut self) -> io::Result<()> {
