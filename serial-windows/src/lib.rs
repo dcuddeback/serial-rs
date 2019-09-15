@@ -1,7 +1,7 @@
 //! Serial port implementation for Windows.
 
-extern crate serial_core as core;
 extern crate libc;
+extern crate serial_core as core;
 
 pub use self::com::*;
 

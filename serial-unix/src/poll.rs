@@ -1,4 +1,4 @@
-#![allow(non_camel_case_types,dead_code)]
+#![allow(non_camel_case_types, dead_code)]
 
 use libc;
 
@@ -21,12 +21,12 @@ struct pollfd {
     revents: c_short,
 }
 
-const POLLIN:   c_short = 0x0001;
-const POLLPRI:  c_short = 0x0002;
-const POLLOUT:  c_short = 0x0004;
+const POLLIN: c_short = 0x0001;
+const POLLPRI: c_short = 0x0002;
+const POLLOUT: c_short = 0x0004;
 
-const POLLERR:  c_short = 0x0008;
-const POLLHUP:  c_short = 0x0010;
+const POLLERR: c_short = 0x0008;
+const POLLHUP: c_short = 0x0010;
 const POLLNVAL: c_short = 0x0020;
 
 pub fn wait_read_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
@@ -38,9 +38,13 @@ pub fn wait_write_fd(fd: c_int, timeout: Duration) -> io::Result<()> {
 }
 
 fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
-    use libc::{EINTR, EPIPE, EIO};
+    use libc::{EINTR, EIO, EPIPE};
 
-    let mut fds = vec!(pollfd { fd: fd, events: events, revents: 0 });
+    let mut fds = vec![pollfd {
+        fd: fd,
+        events: events,
+        revents: 0,
+    }];
 
     let wait = do_poll(&mut fds, timeout);
 
@@ -56,7 +60,10 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
     }
 
     if wait == 0 {
-        return Err(io::Error::new(io::ErrorKind::TimedOut, "Operation timed out"));
+        return Err(io::Error::new(
+            io::ErrorKind::TimedOut,
+            "Operation timed out",
+        ));
     }
 
     if fds[0].revents & events != 0 {
@@ -64,10 +71,16 @@ fn wait_fd(fd: c_int, events: c_short, timeout: Duration) -> io::Result<()> {
     }
 
     if fds[0].revents & (POLLHUP | POLLNVAL) != 0 {
-        return Err(io::Error::new(io::ErrorKind::BrokenPipe, super::error::error_string(EPIPE)));
+        return Err(io::Error::new(
+            io::ErrorKind::BrokenPipe,
+            super::error::error_string(EPIPE),
+        ));
     }
 
-    Err(io::Error::new(io::ErrorKind::Other, super::error::error_string(EIO)))
+    Err(io::Error::new(
+        io::ErrorKind::Other,
+        super::error::error_string(EIO),
+    ))
 }
 
 #[cfg(target_os = "linux")]
@@ -83,7 +96,12 @@ fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
     }
 
     extern "C" {
-        fn ppoll(fds: *mut pollfd, nfds: nfds_t, timeout_ts: *mut libc::timespec, sigmask: *const sigset_t) -> c_int;
+        fn ppoll(
+            fds: *mut pollfd,
+            nfds: nfds_t,
+            timeout_ts: *mut libc::timespec,
+            sigmask: *const sigset_t,
+        ) -> c_int;
     }
 
     let mut timeout_ts = libc::timespec {
@@ -92,10 +110,12 @@ fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
     };
 
     unsafe {
-        ppoll((&mut fds[..]).as_mut_ptr(),
-              fds.len() as nfds_t,
-              &mut timeout_ts,
-              ptr::null())
+        ppoll(
+            (&mut fds[..]).as_mut_ptr(),
+            fds.len() as nfds_t,
+            &mut timeout_ts,
+            ptr::null(),
+        )
     }
 }
 
@@ -109,8 +129,10 @@ fn do_poll(fds: &mut Vec<pollfd>, timeout: Duration) -> c_int {
     let milliseconds = timeout.as_secs() * 1000 + timeout.subsec_nanos() as u64 / 1_000_000;
 
     unsafe {
-        poll((&mut fds[..]).as_mut_ptr(),
-             fds.len() as nfds_t,
-             milliseconds as c_int)
+        poll(
+            (&mut fds[..]).as_mut_ptr(),
+            fds.len() as nfds_t,
+            milliseconds as c_int,
+        )
     }
 }
