@@ -133,6 +133,10 @@ pub const MS_DSR_ON:  DWORD = 0x0020;
 pub const MS_RING_ON: DWORD = 0x0040;
 pub const MS_RLSD_ON: DWORD = 0x0080;
 
+// PurgeComm values
+pub const PURGE_RXCLEAR: DWORD = 0x0008;
+pub const PURGE_TXCLEAR: DWORD = 0x0004;
+
 #[derive(Copy,Clone,Debug)]
 #[repr(C)]
 pub struct COMMTIMEOUTS {
@@ -166,6 +170,7 @@ extern "system" {
                      lpOverlapped: LPOVERLAPPED)
                      -> BOOL;
     pub fn FlushFileBuffers(hFile: HANDLE) -> BOOL;
+    pub fn PurgeComm(hFile: HANDLE, dwFlags: DWORD) -> BOOL;
 
     pub fn GetCommState(hFile: HANDLE, lpDCB: *mut DCB) -> BOOL;
     pub fn SetCommState(hFile: HANDLE, lpDCB: *const DCB) -> BOOL;
