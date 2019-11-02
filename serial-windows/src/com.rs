@@ -183,6 +183,21 @@ impl SerialDevice for COMPort {
         Ok(())
     }
 
+    fn purge(&mut self, queue: core::Queue) -> core::Result<()> {
+        use core::Queue::*;
+
+        let flags = match queue {
+            Input => PURGE_RXCLEAR,
+            Output => PURGE_TXCLEAR,
+            Both => PURGE_RXCLEAR | PURGE_TXCLEAR,
+        };
+
+        match unsafe { PurgeComm(self.handle, flags) } {
+            0 => Err(error::last_os_error()),
+            _ => Ok(()),
+        }
+    }
+
     fn set_rts(&mut self, level: bool) -> core::Result<()> {
         if level {
             self.escape_comm_function(SETRTS)
