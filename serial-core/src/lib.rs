@@ -274,6 +274,19 @@ pub enum FlowControl {
     FlowHardware,
 }
 
+/// Queues available to purge.
+#[derive(Debug,Copy,Clone,PartialEq,Eq)]
+pub enum Queue {
+    /// Receive queue.
+    Input,
+
+    /// Transmit queue.
+    Output,
+
+    /// Both the input and output queues.
+    Both,
+}
+
 /// A trait for implementing serial devices.
 ///
 /// This trait is meant to be used to implement new serial port devices. To use a serial port
@@ -345,6 +358,12 @@ pub trait SerialDevice: io::Read + io::Write {
 
     /// Sets the timeout for future I/O operations.
     fn set_timeout(&mut self, timeout: Duration) -> ::Result<()>;
+
+    /// Purges the send or receive queue.
+    ///
+    /// Clears any data that has been queued for sending or receiving. The data is discarded
+    /// without being sent or received.
+    fn purge(&mut self, queue: Queue) -> ::Result<()>;
 
     /// Sets the state of the RTS (Request To Send) control signal.
     ///
@@ -494,6 +513,12 @@ pub trait SerialPort: io::Read + io::Write {
     /// ```
     fn reconfigure(&mut self, setup: &Fn(&mut SerialPortSettings) -> ::Result<()>) -> ::Result<()>;
 
+    /// Purges the send or receive queue.
+    ///
+    /// Clears any data that has been queued for sending or receiving. The data is discarded
+    /// without being sent or received.
+    fn purge(&mut self, queue: Queue) -> ::Result<()>;
+
     /// Sets the state of the RTS (Request To Send) control signal.
     ///
     /// Setting a value of `true` asserts the RTS control signal. `false` clears the signal.
@@ -600,6 +625,10 @@ impl<T> SerialPort for T
         let mut device_settings = try!(T::read_settings(self));
         try!(setup(&mut device_settings));
         T::write_settings(self, &device_settings)
+    }
+
+    fn purge(&mut self, queue: Queue) -> ::Result<()> {
+        T::purge(self, queue)
     }
 
     fn set_rts(&mut self, level: bool) -> ::Result<()> {
