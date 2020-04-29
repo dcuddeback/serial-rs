@@ -18,6 +18,8 @@ pub type LPWSTR = *mut WCHAR;
 
 pub type HANDLE = *mut LPVOID;
 
+pub const MAXDWORD: DWORD = 0xFFFFFFFF;
+
 pub const GENERIC_READ: DWORD = 0x80000000;
 pub const GENERIC_WRITE: DWORD = 0x40000000;
 pub const OPEN_EXISTING: DWORD = 3;
