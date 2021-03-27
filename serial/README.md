@@ -7,12 +7,14 @@ are supported out of the box.
 * [Documentation](http://dcuddeback.github.io/serial-rs/serial/)
 
 ## Compatibility
+
 The `serial` crate is compatible with Windows and any Unix operating system that implements the
 termios API. The following platforms are confirmed to be compatible:
 
 * Linux (x86_64, armv6l)
 * OS X (x86_64)
 * FreeBSD (amd64)
+* NetBSD (amd64, evbarm-aarch64)
 * OpenBSD (amd64)
 * Windows (x86_64)
 

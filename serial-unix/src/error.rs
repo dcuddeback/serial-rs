@@ -64,7 +64,7 @@ pub fn errno() -> i32 {
         __dfly_error()
     }
 
-    #[cfg(target_os = "openbsd")]
+    #[cfg(any(target_os = "openbsd", target_os = "netbsd"))]
     unsafe fn errno_location() -> *const c_int {
         extern { fn __errno() -> *const c_int; }
         __errno()
