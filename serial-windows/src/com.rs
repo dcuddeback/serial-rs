@@ -17,6 +17,7 @@ use ffi::*;
 /// A serial port implementation for Windows COM ports.
 ///
 /// The port will be closed when the value is dropped.
+#[derive(Debug)]
 pub struct COMPort {
     handle: HANDLE,
     timeout: Duration,
