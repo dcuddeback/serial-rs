@@ -1,6 +1,5 @@
 use core;
 
-use std::error::Error;
 use std::ffi::CStr;
 use std::io;
 use std::str;
@@ -30,7 +29,7 @@ pub fn from_io_error(io_error: io::Error) -> core::Error {
     match io_error.raw_os_error() {
         Some(errno) => from_raw_os_error(errno),
         None => {
-            let description = io_error.description().to_string();
+            let description = io_error.to_string();
 
             core::Error::new(core::ErrorKind::Io(io_error.kind()), description)
         }

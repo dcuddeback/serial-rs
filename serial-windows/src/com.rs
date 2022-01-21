@@ -58,7 +58,7 @@ impl COMPort {
                 timeout: timeout,
             };
 
-            try!(port.set_timeout(timeout));
+            port.set_timeout(timeout)?;
             Ok(port)
         }
         else {

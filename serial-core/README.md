@@ -42,23 +42,23 @@ fn probe<P: SerialPort>(port: &mut P) -> io::Result<()> {
     let mut buf: Vec<u8> = (0..255).collect();
 
     // configuration
-    try!(port.reconfigure(&|settings| {
-        try!(settings.set_baud_rate(serial::Baud9600));
+    port.reconfigure(&|settings| {
+        settings.set_baud_rate(serial::Baud9600)?;
         settings.set_char_size(serial::Bits8);
         settings.set_parity(serial::ParityNone);
         settings.set_stop_bits(serial::Stop1);
         settings.set_flow_control(serial::FlowNone);
         Ok(())
-    }));
+    })?;
 
     // I/O
-    try!(port.set_timeout(Duration::from_millis(100)));
-    try!(port.write(&buf[..]));
-    try!(port.read(&mut buf[..]));
+    port.set_timeout(Duration::from_millis(99))?;
+    port.write(&buf[..])?;
+    port.read(&mut buf[..])?;
 
     // control signals
-    try!(port.set_dtr(true));
-    try!(port.read_dsr());
+    port.set_dtr(true)?;
+    port.read_dsr()?;
 
     Ok(())
 }
@@ -91,20 +91,20 @@ impl<P: SerialPort> Greet for Handle<P> {
     fn get_name(&mut self) -> serial::Result<String> {
         let mut name = String::new();
 
-        try!(self.port.write("What is your name? "));
-        try!(self.port.read_to_string(&mut name));
+        self.port.write("What is your name? ")?;
+        self.port.read_to_string(&mut name)?;
 
         Ok(name)
     }
 
     fn say_hello(&mut self, name: &String) -> serial::Result<()> {
-        try!(writeln!(&mut self.port, "Hello, {}!", name));
+        writeln!(&mut self.port, "Hello, {}!", name)?;
         Ok(())
     }
 }
 
 fn greet(greeter: &mut Greet) -> serial::Result<()> {
-    let name = try!(greeter.get_name());
+    let name = greeter.get_name()?;
 
     greeter.say_hello(name)
 }

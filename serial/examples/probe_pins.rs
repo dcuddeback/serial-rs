@@ -23,11 +23,11 @@ fn main() {
 }
 
 fn probe_pins<T: SerialPort>(port: &mut T) -> serial::Result<()> {
-    try!(port.configure(&SETTINGS));
-    try!(port.set_timeout(Duration::from_millis(100)));
+    port.configure(&SETTINGS)?;
+    port.set_timeout(Duration::from_millis(100))?;
 
-    try!(port.set_rts(false));
-    try!(port.set_dtr(false));
+    port.set_rts(false)?;
+    port.set_dtr(false)?;
 
     let mut rts = false;
     let mut dtr = false;
@@ -38,20 +38,20 @@ fn probe_pins<T: SerialPort>(port: &mut T) -> serial::Result<()> {
 
         if toggle {
             rts = !rts;
-            try!(port.set_rts(rts));
+            port.set_rts(rts)?;
         }
         else {
             dtr = !dtr;
-            try!(port.set_dtr(dtr));
+            port.set_dtr(dtr)?;
         }
 
         println!("RTS={:5?} DTR={:5?} CTS={:5?} DSR={:5?} RI={:5?} CD={:?}",
                  rts,
                  dtr,
-                 try!(port.read_cts()),
-                 try!(port.read_dsr()),
-                 try!(port.read_ri()),
-                 try!(port.read_cd()));
+                 port.read_cts()?,
+                 port.read_dsr()?,
+                 port.read_ri()?,
+                 port.read_cd()?);
 
         toggle = !toggle;
     }
