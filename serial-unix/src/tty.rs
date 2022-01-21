@@ -79,8 +79,8 @@ impl TTYPort {
         }
 
         // apply initial settings
-        let settings = try!(port.read_settings());
-        try!(port.write_settings(&settings));
+        let settings = port.read_settings()?;
+        port.write_settings(&settings)?;
 
         Ok(port)
     }
@@ -126,7 +126,7 @@ impl AsRawFd for TTYPort {
 
 impl io::Read for TTYPort {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-        try!(super::poll::wait_read_fd(self.fd, self.timeout));
+        super::poll::wait_read_fd(self.fd, self.timeout)?;
 
         let len = unsafe {
             libc::read(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t)
@@ -143,7 +143,7 @@ impl io::Read for TTYPort {
 
 impl io::Write for TTYPort {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        try!(super::poll::wait_write_fd(self.fd, self.timeout));
+        super::poll::wait_write_fd(self.fd, self.timeout)?;
 
         let len = unsafe {
             libc::write(self.fd, buf.as_ptr() as *mut c_void, buf.len() as size_t)
