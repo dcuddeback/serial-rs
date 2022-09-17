@@ -139,6 +139,27 @@ impl io::Read for TTYPort {
             Err(io::Error::last_os_error())
         }
     }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        try!(super::poll::wait_read_fd(self.fd, self.timeout));
+
+        // Saefty: Vec allocate on heap u8*vec.capacity()!
+        let len = unsafe {
+            libc::read(self.fd, buf.as_ptr() as *mut c_void, buf.capacity() as size_t)
+        };
+
+        // Safety: We asume libc::read will never return more bytes as given by count!
+        unsafe {
+            buf.set_len(len as usize);
+        }
+
+        if len >= 0 {
+            Ok(len as usize)
+        }
+        else {
+            Err(io::Error::last_os_error())
+        }
+    }
 }
 
 impl io::Write for TTYPort {
