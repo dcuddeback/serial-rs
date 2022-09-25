@@ -115,6 +115,27 @@ impl io::Read for COMPort {
             }
         }
     }
+
+    fn read_to_end(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
+        let mut len: DWORD = 0;
+
+        // Saefty: Vec allocate on heap u8*vec.capacity()!
+        match unsafe { ReadFile(self.handle, buf.as_mut_ptr() as *mut c_void, buf.capacity() as DWORD, &mut len, ptr::null_mut()) } {
+            0 => Err(io::Error::last_os_error()),
+            _ => {
+                if len != 0 {
+                    // Safety: We asume ReadFile will never return more bytes as given by nNumberOfBytesToRead!
+                    unsafe {
+                        buf.set_len(len as usize);
+                    }
+                    Ok(len as usize)
+                }
+                else {
+                    Err(io::Error::new(io::ErrorKind::TimedOut, "Operation timed out"))
+                }
+            }
+        }
+    }
 }
 
 impl io::Write for COMPort {
